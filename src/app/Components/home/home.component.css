@@ -1,0 +1,13 @@
+.espaciador {
+    flex: 1 1 auto;
+}
+
+mat-toolbar {
+    display: flex;
+    justify-content: space-between;
+}
+
+.responsiveImage {
+    width: 10%;
+    height: auto;
+}

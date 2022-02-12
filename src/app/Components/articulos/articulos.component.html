@@ -1,0 +1,49 @@
+<div class="CenterTable">
+
+    <mat-form-field appearance="standard">
+        <mat-label>Busqueda de articulos</mat-label>
+        <input matInput placeholder="buscar..." (keyup)="filtrarArticulos()" type="text" [(ngModel)]="textoBusqueda">
+    </mat-form-field>
+
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+        <ng-container matColumnDef="Articulo">
+            <th mat-header-cell *matHeaderCellDef>Articulo</th>
+            <td mat-cell *matCellDef="let articulo">{{articulo.Nombre}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="Imagen">
+            <th mat-header-cell *matHeaderCellDef>Imagen</th>
+            <td mat-cell *matCellDef="let articulo">
+                <img [src]="urlImages" alt="Piso ejemplo">
+            </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="Descripción">
+            <th mat-header-cell *matHeaderCellDef>Descripción</th>
+            <td mat-cell *matCellDef="let articulo">{{articulo.Descripcion}}</td>
+        </ng-container>
+    
+        <ng-container *ngIf="esAsesor" matColumnDef="Precio">
+            <th mat-header-cell *matHeaderCellDef>Precio</th>
+            <td mat-cell *matCellDef="let articulo">${{articulo.Precio}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="Opciones">
+            <th mat-header-cell *matHeaderCellDef>Opciones</th>
+            <td mat-cell *matCellDef="let articulo">
+                <mat-icon (click)="MostrarSnackBar('Agregado al carrito', articulo)" matTooltip="Agregar al carrito">shopping_cart</mat-icon>
+            </td>
+        </ng-container>
+    
+        <tr mat-header-row *matHeaderRowDef="columnasTabla"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnasTabla;"></tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5,10,25,50]"
+                   showFirstLastButtons
+                   [pageSize]="5"
+                   color="warn"
+                   class="mat-elevation-z8">
+    </mat-paginator>
+</div>
+

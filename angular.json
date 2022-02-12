@@ -1,5 +1,8 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "cli": {
+    "analytics": "87605dbb-485e-476f-9c57-436235666ea6"
+  },
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
@@ -26,16 +29,8 @@
               "src/favicon.ico",
               "src/assets"
             ],
-            "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
-              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "src/styles.css"
-            ],
-            "scripts": [
-              "./node_modules/bootstrap/dist/js/bootstrap.min.js",
-              "./node_modules/jquery/dist/jquery.min.js",
-              "./node_modules/@popperjs/core/dist/umd/popper.min.js"
-            ]
+            "styles": [ "./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css", "node_modules/bootstrap/dist/css/bootstrap.min.css"],
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -99,16 +94,8 @@
               "src/favicon.ico",
               "src/assets"
             ],
-            "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
-              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "src/styles.css"
-            ],
-            "scripts": [
-              "./node_modules/bootstrap/dist/js/bootstrap.min.js",
-              "./node_modules/jquery/dist/jquery.min.js",
-              "./node_modules/@popperjs/core/dist/umd/popper.min.js"
-            ]
+            "styles": [ "./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css"],
+            "scripts": []
           }
         }
       }

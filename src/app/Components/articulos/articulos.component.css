@@ -1,0 +1,29 @@
+.CenterTable {
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+.mat-icon:hover {
+    cursor: pointer;
+}
+
+.mat-row:hover {
+    background-color: yellow;
+}
+
+.mat-form-field {
+    width: 100%;
+}
+
+table {
+    width: 100%;
+}
+
+img {
+    width: 64px;
+    height: 64px;
+}
+
+img:hover {
+    cursor: pointer;
+}

@@ -1,0 +1,52 @@
+<div class="container mt-3" *ngIf="carrito.length === 0">
+    <div class="row">
+        <div class="offset-md-3 col-md-6">
+            <div class="alert alert-primary" role="alert">
+                En este momento no tienes articulos en tu carrito
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container mt-3" *ngIf="carrito.length > 0" >
+    <div class="row">
+        <div class="offset-md-3 col-md-6">
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr class="text-center">
+                        <th>Imagen</th>
+                        <th>Articulo</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="text-center" *ngFor="let articulo of carrito">
+                        <td>
+                            <img [src]="urlImages" alt="Articulo">
+                        </td>
+                        <td>{{articulo.Nombre}}</td>
+                        <td>{{articulo.Precio}}</td>
+                        <td>
+                            <input class="form-control" type="number" min="1" (change)="calcularTotalCarrito()" [(ngModel)]="articulo.Cantidad">
+                        </td>
+                        <td>
+                            <fa-icon [icon]="deleteIcon" class="fa-lg" matTooltip="Quitar" (click)="QuitarArticulo(articulo)"></fa-icon>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="offset-md-3 col-md-6">
+            <div class="alert alert-primary" role="alert">
+                <div class="col-md-12">
+                    <div class="offset-md-10">
+                        <b>Total: ${{Total}}</b> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+mat-card {
+    margin-left: 30%;
+    margin-right: 30%;
+    margin-top: 10%;
+}
+
+.linearlayout {
+    display: block;
+}
+
+@media screen and (max-width: 500px) {
+    mat-card-title {
+        font-size: medium;
+    }
+}

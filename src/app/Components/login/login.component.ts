@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import { Usuario } from '../../Models/Usuario'
 
 @Component({
   selector: 'app-login',
@@ -9,24 +11,37 @@ import { Title } from '@angular/platform-browser';
 })
 export class LoginComponent implements OnInit {
 
-  title = 'Subdistribuidores VHA';
-  email = new FormControl('',[Validators.required, Validators.email]);
+  title = 'Subdistribuidores';
+  
+  usuario = new FormControl('',[Validators.required, Validators.email]);
   contrasena = new FormControl('', [Validators.required])
   hide = true;
 
-  public constructor(private titleService: Title) { 
+  public constructor(private titleService: Title, private router: Router) { 
     this.titleService.setTitle('Login');
+    if(localStorage.getItem('usuario') !== null) {
+      this.router.navigate(['/home']);
+    }
   }
 
   getEmailError() : string {
-    if (this.email.hasError('required')){
-      return 'Debe ingresar un correo'
+    if (this.usuario.hasError('required')){
+      return 'Debe ingresar un correo';
     } 
 
-    return (this.email.hasError('email')) ? 'Ingrese un correo valido' : '';
+    return (this.usuario.hasError('email')) ? 'Ingrese un correo valido' : '';
   }
 
-  
+  login(): void {
+    const UsuarioLogin: Usuario = {
+      correo: this.usuario.value,
+      contrasena: this.contrasena.value
+    };
+
+    localStorage.setItem('usuario', JSON.stringify(UsuarioLogin));
+    this.router.navigate(['/home']);
+  }
+
   ngOnInit(): void {
     
   }

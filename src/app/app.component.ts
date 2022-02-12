@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { Usuario } from './Models/Usuario';
+import { Component, OnDestroy } from '@angular/core';
 
 @Component({
   selector: 'app-root',
