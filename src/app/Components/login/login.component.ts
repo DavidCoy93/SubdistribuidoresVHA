@@ -35,7 +35,8 @@ export class LoginComponent implements OnInit {
   login(): void {
     const UsuarioLogin: Usuario = {
       correo: this.usuario.value,
-      contrasena: this.contrasena.value
+      contrasena: this.contrasena.value,
+      esAsesor: true
     };
 
     localStorage.setItem('usuario', JSON.stringify(UsuarioLogin));

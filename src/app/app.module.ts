@@ -16,13 +16,23 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule } from '@angular/material/dialog';
 import { LoginComponent } from './Components/login/login.component';
 import { HomeComponent } from './Components/home/home.component';
 import { ArticulosComponent } from './Components/articulos/articulos.component';
 import { MatPaginatorIntlSpanish } from './Utilidades/spanish-paginator';
 import { CarritoComponent } from './Components/carrito/carrito.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { GlobalsService } from './Services/globals.service';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { ZXingScannerModule } from '@zxing/ngx-scanner';
+import { DialogView } from './Components/notificacion/dialogView';
+import { NZ_I18N } from 'ng-zorro-antd/i18n';
+import { en_US } from 'ng-zorro-antd/i18n';
+import { registerLocaleData } from '@angular/common';
+import en from '@angular/common/locales/en';
+import { HttpClientModule } from '@angular/common/http';
+
+registerLocaleData(en);
 
 @NgModule({
   declarations: [
@@ -30,7 +40,8 @@ import { GlobalsService } from './Services/globals.service';
     LoginComponent,
     HomeComponent,
     ArticulosComponent,
-    CarritoComponent
+    CarritoComponent,
+    DialogView
   ],
   imports: [
     BrowserModule,
@@ -50,11 +61,16 @@ import { GlobalsService } from './Services/globals.service';
     MatPaginatorModule,
     MatTooltipModule,
     MatSnackBarModule,
-    NgbModule
+    MatDialogModule,
+    NgbModule,
+    FlexLayoutModule,
+    ZXingScannerModule,
+    HttpClientModule
   ],
   providers: [
     Title,
-    {provide: MatPaginatorIntl, useClass: MatPaginatorIntlSpanish}
+    {provide: MatPaginatorIntl, useClass: MatPaginatorIntlSpanish},
+    { provide: NZ_I18N, useValue: en_US }
   ],
   bootstrap: [AppComponent]
 })

@@ -23,7 +23,7 @@
             <td mat-cell *matCellDef="let articulo">{{articulo.Descripcion}}</td>
         </ng-container>
     
-        <ng-container *ngIf="esAsesor" matColumnDef="Precio">
+        <ng-container *ngIf="subdistribuidor.esAsesor" matColumnDef="Precio">
             <th mat-header-cell *matHeaderCellDef>Precio</th>
             <td mat-cell *matCellDef="let articulo">${{articulo.Precio}}</td>
         </ng-container>

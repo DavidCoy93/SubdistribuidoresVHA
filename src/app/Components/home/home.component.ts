@@ -4,6 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Articulo } from 'src/app/Models/Articulo';
 import { Usuario } from 'src/app/Models/Usuario';
 import { CarritoComponent } from '../carrito/carrito.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogView } from '../notificacion/dialogView';
 
 @Component({
   selector: 'app-home',
@@ -14,20 +17,25 @@ export class HomeComponent implements OnInit {
 
   UsuarioObj: Usuario = {};
   carritoArticulos: Articulo[] = [];
-  numeroArticulos: number = 0;
   verArticulos: boolean = true;
   verCarrito: boolean = false;
+  tieneCamaras: boolean = false;
 
   @ViewChild(CarritoComponent) carritoChild!: CarritoComponent;
 
-  public constructor(private titleService: Title, private route: ActivatedRoute, private router: Router) { 
-    this.titleService.setTitle('Inicio');
-    // @ts-ignore
-    this.UsuarioObj = JSON.parse(localStorage.getItem('usuario'));
-  }
+  public constructor( 
+    private titleService: Title, 
+    private route: ActivatedRoute, 
+    private router: Router,
+    private modalService: NgbModal,
+    private dialog: MatDialog) 
+    { 
+      this.titleService.setTitle('Inicio');
+      // @ts-ignore
+      this.UsuarioObj = JSON.parse(localStorage.getItem('usuario'));
+    }
 
   ngOnInit(): void {
-    
   }
 
   cerrarSesion(): void {
@@ -37,7 +45,7 @@ export class HomeComponent implements OnInit {
 
   agregarArticuloCarrito(art: Articulo): void {
     
-    let ArticuloExistente = this.carritoArticulos.filter(articulo => articulo === art)[0];
+    let ArticuloExistente = this.carritoArticulos.filter(articulo => articulo.Nombre === art.Nombre)[0];
     if (ArticuloExistente === null || ArticuloExistente === undefined) {
       this.carritoArticulos.push(art)
     } else {
@@ -47,7 +55,6 @@ export class HomeComponent implements OnInit {
         }
       });
     }
-    this.numeroArticulos = this.carritoArticulos.length;
   }
 
   quitarArticuloCarrito(art: Articulo): void {
@@ -57,8 +64,41 @@ export class HomeComponent implements OnInit {
         break;
       }
     }
-    this.numeroArticulos = this.carritoArticulos.length;
     this.carritoChild.calcularTotalCarrito();
   }
 
+  deshacerCambiosCarrito(): void {
+    this.carritoArticulos.splice(this.carritoArticulos.length -1, 1)
+  }
+
+  abrirModalQR(contentQR: any): void {
+    this.modalService.open(contentQR, {backdropClass: 'backDropModal', size: 'md'});
+  }
+
+  codigoEscaneado(url: string): void {
+    this.verArticulos = false;
+    this.verCarrito = true;
+    this.modalService.dismissAll();
+  }
+
+  permisosCamara(otorgoPermiso: boolean): void {
+    if(!otorgoPermiso) {
+      this.modalService.dismissAll();
+      let dialogRef = this.dialog.open(DialogView, {
+        width: '400px',
+        data: {titulo: 'Advertencia', mensaje: 'No perimitio el uso de la camara, por favor permita usar la camara'}
+      })
+    }
+  }
+
+  camarasEncotradas(camaras: MediaDeviceInfo[]): void {
+    this.tieneCamaras = (camaras.length > 0) ? true : false;
+    if(!this.tieneCamaras) {
+      this.modalService.dismissAll();
+      let dialogRef = this.dialog.open(DialogView, {
+        width: '250px',
+        data: {titulo: 'Error', mensaje: 'No se encontraron camaras en este dispositivo'}
+      })
+    }
+  }
 }

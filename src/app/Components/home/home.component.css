@@ -1,13 +1,18 @@
-.espaciador {
-    flex: 1 1 auto;
+.logo {
+    height: 50px;
+    width: 200px;
+    cursor: pointer;
 }
 
-mat-toolbar {
-    display: flex;
-    justify-content: space-between;
+.mat-toolbar {
+    background-color: lightgrey;
+    color: #000;
 }
 
-.responsiveImage {
-    width: 10%;
-    height: auto;
+.backDropModal {
+    background-color: transparent;
+}
+
+.modal-title {
+    font-size: medium;
 }

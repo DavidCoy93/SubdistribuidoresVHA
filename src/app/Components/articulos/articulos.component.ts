@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { Articulo } from 'src/app/Models/Articulo';
+import { Usuario } from 'src/app/Models/Usuario';
 import { GlobalsService } from 'src/app/Services/globals.service';
 
 @Component({
@@ -12,20 +13,21 @@ import { GlobalsService } from 'src/app/Services/globals.service';
 })
 export class ArticulosComponent implements AfterViewInit {
 
+  @Input() subdistribuidor: Usuario = {};
   @Output() agregar: EventEmitter<Articulo> = new EventEmitter();
+  @Output() deshacer: EventEmitter<any> = new EventEmitter();
 
   listaArticulos: Articulo[] = [];
   columnasTabla: string[] = ['Articulo', 'Imagen', 'Descripción', 'Opciones'];
   dataSource = new MatTableDataSource<Articulo>(this.listaArticulos);
   textoBusqueda: string = '';
-  esAsesor: boolean = true;
   urlImages: string = '';
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(private _snackBar: MatSnackBar, private _globalService: GlobalsService) {
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 1000; i++) {
       const art: Articulo = {
         Nombre: 'art ' + i,
         Descripcion: 'Es el articulo No ' + i,
@@ -35,7 +37,7 @@ export class ArticulosComponent implements AfterViewInit {
       this.listaArticulos.push(art);
     }
 
-    if (this.esAsesor){
+    if (this.subdistribuidor.esAsesor){
       this.columnasTabla.splice(3,0,'Precio');
     }
 
@@ -47,8 +49,11 @@ export class ArticulosComponent implements AfterViewInit {
   }
 
   MostrarSnackBar(mensaje: string, articulo: Articulo): void {
-    this._snackBar.open(mensaje, 'Deshacer', { duration: 5000 });
+    let snackBarRef = this._snackBar.open(mensaje, 'Deshacer', { duration: 5000 });
     this.agregar.emit(articulo);
+    snackBarRef.onAction().subscribe(() => {
+      this.deshacer.emit();
+    })
   }
 
   filtrarArticulos(): void {
