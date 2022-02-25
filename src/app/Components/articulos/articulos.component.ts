@@ -27,7 +27,7 @@ export class ArticulosComponent implements AfterViewInit {
 
   constructor(private _snackBar: MatSnackBar, private _globalService: GlobalsService) {
 
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 25; i++) {
       const art: Articulo = {
         Nombre: 'art ' + i,
         Descripcion: 'Es el articulo No ' + i,
@@ -37,7 +37,7 @@ export class ArticulosComponent implements AfterViewInit {
       this.listaArticulos.push(art);
     }
 
-    if (this.subdistribuidor.esAsesor){
+    if (this.subdistribuidor.esAdmin){
       this.columnasTabla.splice(3,0,'Precio');
     }
 

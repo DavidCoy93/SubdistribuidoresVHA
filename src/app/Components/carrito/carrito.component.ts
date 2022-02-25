@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Articulo } from 'src/app/Models/Articulo';
 import { GlobalsService } from 'src/app/Services/globals.service';
+import { ViewsService } from 'src/app/Services/views.service';
 
 
 @Component({
@@ -20,7 +21,7 @@ export class CarritoComponent implements OnInit{
   deleteIcon = faTrash;
 
   constructor(private _globalService: GlobalsService) {
-    this.urlImages = _globalService.urlImagenes;
+    this.urlImages = this._globalService.urlImagenes;
   }
 
   calcularTotalCarrito(): void {

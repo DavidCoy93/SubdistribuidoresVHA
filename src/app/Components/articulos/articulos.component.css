@@ -1,4 +1,4 @@
-.CenterTable {
+.centerTable {
     margin-left: 10%;
     margin-right: 10%;
 }
@@ -26,4 +26,9 @@ img {
 
 img:hover {
     cursor: pointer;
+}
+
+.scrollableList {
+    height: auto;
+    overflow-y: auto;
 }

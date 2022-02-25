@@ -16,3 +16,16 @@
 .modal-title {
     font-size: medium;
 }
+
+.footer-home {
+    background-color: whitesmoke;
+}
+
+.footer-home span {
+    font-size: 10pt;
+    font-weight: bolder;
+}
+
+.footer-home mat-toolbar {
+    height: 100%;
+}

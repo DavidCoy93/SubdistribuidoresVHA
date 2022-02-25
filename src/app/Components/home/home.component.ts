@@ -7,6 +7,8 @@ import { CarritoComponent } from '../carrito/carrito.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogView } from '../notificacion/dialogView';
+import { HttpClient } from '@angular/common/http';
+import { ViewsService } from 'src/app/Services/views.service';
 
 @Component({
   selector: 'app-home',
@@ -17,30 +19,55 @@ export class HomeComponent implements OnInit {
 
   UsuarioObj: Usuario = {};
   carritoArticulos: Articulo[] = [];
-  verArticulos: boolean = true;
+  verArticulos: boolean = false;
   verCarrito: boolean = false;
   tieneCamaras: boolean = false;
+  anio: string;
+  camarasDisponibles: MediaDeviceInfo[] = [];
+  camaraSeleccionada?: MediaDeviceInfo;
 
   @ViewChild(CarritoComponent) carritoChild!: CarritoComponent;
 
   public constructor( 
-    private titleService: Title, 
-    private route: ActivatedRoute, 
-    private router: Router,
-    private modalService: NgbModal,
-    private dialog: MatDialog) 
+      private titleService: Title,
+      private router: Router,
+      private modalService: NgbModal,
+      private dialog: MatDialog,
+      private route: ActivatedRoute,
+      private http: HttpClient,
+      private viewService: ViewsService) 
     { 
       this.titleService.setTitle('Inicio');
       // @ts-ignore
       this.UsuarioObj = JSON.parse(localStorage.getItem('usuario'));
+      this.anio = new Date().getFullYear().toString();
+
+      this.viewService.verArticulos.subscribe(mostrarArticulos => {
+        this.verArticulos = mostrarArticulos;
+      });
+
+      this.viewService.verCarrito.subscribe(mostrarCarrito => {
+        this.verCarrito = mostrarCarrito;
+      });
     }
 
   ngOnInit(): void {
+    
   }
 
   cerrarSesion(): void {
     localStorage.removeItem('usuario');
     this.router.navigate(['/login'])
+  }
+
+  mostrarArticulos(): void {
+    this.viewService.verArticulos.next(true);
+    this.viewService.verCarrito.next(false);
+  }
+
+  mostrarCarrito(): void {
+    this.viewService.verArticulos.next(false);
+    this.viewService.verCarrito.next(true);
   }
 
   agregarArticuloCarrito(art: Articulo): void {
@@ -55,6 +82,10 @@ export class HomeComponent implements OnInit {
         }
       });
     }
+
+    this.http.get("http://ip-api.com/json/24.48.0.1").subscribe(resp => {
+      console.log(resp);
+    })
   }
 
   quitarArticuloCarrito(art: Articulo): void {
@@ -72,13 +103,12 @@ export class HomeComponent implements OnInit {
   }
 
   abrirModalQR(contentQR: any): void {
-    this.modalService.open(contentQR, {backdropClass: 'backDropModal', size: 'md'});
+    this.modalService.open(contentQR, {backdropClass: 'backDropModal', size: 'md', });
   }
 
   codigoEscaneado(url: string): void {
-    this.verArticulos = false;
-    this.verCarrito = true;
     this.modalService.dismissAll();
+    this.router.navigate(['./articulo/' + url], {relativeTo: this.route});
   }
 
   permisosCamara(otorgoPermiso: boolean): void {
@@ -99,6 +129,10 @@ export class HomeComponent implements OnInit {
         width: '250px',
         data: {titulo: 'Error', mensaje: 'No se encontraron camaras en este dispositivo'}
       })
+    } else {
+      this.camarasDisponibles = camaras;
+      this.camaraSeleccionada = camaras[0];
     }
   }
+
 }

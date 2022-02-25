@@ -6,3 +6,8 @@ img {
 fa-icon:hover {
     cursor: pointer;
 }
+
+table {
+    max-height: 50%;
+    overflow-y: scroll;
+}

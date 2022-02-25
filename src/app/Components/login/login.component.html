@@ -1,25 +1,35 @@
-<mat-card>
-    <mat-card-header>
-        <img mat-card-image src="assets/img/Logotipo_C.png" alt="logo vitrohogar">
-    </mat-card-header>
-    <mat-card-content>
-        <mat-card-title>{{title}}</mat-card-title>
-        <mat-form-field appearance="fill" class="linearlayout">
-            <mat-label>Correo</mat-label>
-            <input matInput placeholder="example@gmail.com" [formControl]="usuario" required>
-            <mat-error *ngIf="usuario.invalid">{{getEmailError()}}</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="linearlayout">
-            <mat-label>Contraseña</mat-label>
-            <input matInput [type]="hide ? 'password' : 'text'" [formControl]="contrasena" required>
-            <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-              <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-            </button>
-            <mat-error *ngIf="contrasena.invalid">Ingrese la contraseña</mat-error>
-        </mat-form-field>
-        <button [disabled]="usuario.invalid || contrasena.invalid" mat-raised-button color="warn" (click)="login()" >Entrar</button>
-    </mat-card-content>
-        
-    
-</mat-card>
+<div fxLayout="row" fxFill>
+    <div fxFlexOffset="25" fxFlex="50">
+        <div fxLayout="column">
+            <div fxFlexOffset="10" fxFlex="50">
+                <mat-card>
+                    <mat-card-header>
+                        <img mat-card-image src="assets/img/Logotipo_C.png" alt="logo vitrohogar">
+                    </mat-card-header>
+                    <mat-card-content>
+                        <mat-card-title ngClass.xs="smallText" ngClass.sm="smallText">{{title}}</mat-card-title>
+                        <form [formGroup]="loginForm" (ngSubmit)="login()">
+                            <mat-form-field appearance="fill" class="linearlayout">
+                                <mat-label>No. Cliente</mat-label>
+                                <input matInput formControlName="usuario" required>
+                                <mat-error *ngIf="usuario?.errors?.['required']">Ingrese su número de cliente</mat-error>
+                            </mat-form-field>
+                    
+                            <mat-form-field appearance="fill" class="linearlayout">
+                                <mat-label>Contraseña</mat-label>
+                                <input matInput [type]="hide ? 'password' : 'text'" formControlName="contrasena" required>
+                                <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                                <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                                </button>
+                                <mat-error *ngIf="contrasena?.errors?.['required']">Ingrese la contraseña</mat-error>
+                            </mat-form-field>
+                            <div fxLayout="row-reverse" fxFill>
+                                <button type="submit" [disabled]="loginForm.invalid" mat-raised-button color="warn" ngClass.xs="buttonSmallResolution" ngClass.sm="buttonSmallResolution">Entrar</button>
+                            </div>
+                        </form>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,12 @@
+.img-articulo img {
+    width: 100%;
+    height: auto;
+}
+
+.descripcion {
+    background-color: yellow;
+}
+
+.disponibles {
+    background-color: red;
+}

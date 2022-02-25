@@ -3,6 +3,12 @@ import { BrowserModule, Title } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { LoginComponent } from './Components/login/login.component';
+import { HomeComponent } from './Components/home/home.component';
+import { DetalleArticuloComponent } from './Components/detalle-articulo/detalle-articulo.component';
+import { ArticulosComponent } from './Components/articulos/articulos.component';
+import { CarritoComponent } from './Components/carrito/carrito.component';
+import { DialogView } from './Components/notificacion/dialogView';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -17,20 +23,19 @@ import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginato
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
-import { LoginComponent } from './Components/login/login.component';
-import { HomeComponent } from './Components/home/home.component';
-import { ArticulosComponent } from './Components/articulos/articulos.component';
+import { MatSelectModule } from '@angular/material/select';
 import { MatPaginatorIntlSpanish } from './Utilidades/spanish-paginator';
-import { CarritoComponent } from './Components/carrito/carrito.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
-import { DialogView } from './Components/notificacion/dialogView';
 import { NZ_I18N } from 'ng-zorro-antd/i18n';
 import { en_US } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
 import en from '@angular/common/locales/en';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ngxLoadingAnimationTypes, NgxLoadingModule } from 'ngx-loading';
+import { InterceptorService } from './Services/interceptor.service';
+
 
 registerLocaleData(en);
 
@@ -41,7 +46,8 @@ registerLocaleData(en);
     HomeComponent,
     ArticulosComponent,
     CarritoComponent,
-    DialogView
+    DialogView,
+    DetalleArticuloComponent
   ],
   imports: [
     BrowserModule,
@@ -62,15 +68,18 @@ registerLocaleData(en);
     MatTooltipModule,
     MatSnackBarModule,
     MatDialogModule,
+    MatSelectModule,
     NgbModule,
     FlexLayoutModule,
     ZXingScannerModule,
-    HttpClientModule
+    HttpClientModule,
+    NgxLoadingModule.forRoot({animationType: ngxLoadingAnimationTypes.circleSwish, primaryColour: 'red'})
   ],
   providers: [
     Title,
     {provide: MatPaginatorIntl, useClass: MatPaginatorIntlSpanish},
-    { provide: NZ_I18N, useValue: en_US }
+    { provide: NZ_I18N, useValue: en_US },
+    { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true}
   ],
   bootstrap: [AppComponent]
 })
