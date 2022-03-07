@@ -19,16 +19,10 @@ table {
     width: 100%;
 }
 
-img {
-    width: 64px;
-    height: 64px;
-}
-
 img:hover {
     cursor: pointer;
 }
 
-.scrollableList {
-    height: auto;
-    overflow-y: auto;
+mat-card:hover {
+    border: 1px solid red;
 }

@@ -8,5 +8,16 @@
 }
 
 .disponibles {
-    background-color: red;
+    height: auto;
+    overflow-y: auto;
+}
+
+.disponibles thead th {
+    background-color: aquamarine;
+    position: sticky;
+    top: 0;
+}
+
+.disponibles tbody td {
+    text-align: center;
 }

@@ -29,3 +29,10 @@
 .footer-home mat-toolbar {
     height: 100%;
 }
+
+.ScrollableContent {
+    height: auto;
+    overflow-y: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}

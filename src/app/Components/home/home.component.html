@@ -21,6 +21,10 @@
                     <mat-icon>qr_code_2</mat-icon>
                     <span>Buscar por QR</span>
                 </a>
+                <a mat-button>
+                    <mat-icon>add_circle</mat-icon>
+                    <span>Nueva Solicitud</span>
+                </a>
             </div>
         
             <div fxFlexOffset.xs="40" fxFlexOffset.sm="50" fxFlex.xs="10" fxFlex.sm="10"  fxFlex.xs="" fxFlex.md="20" fxFlex.lg="20">
@@ -41,7 +45,7 @@
         </mat-toolbar>
     </div>
 
-    <div fxFlex="80">
+    <div fxFlex="80" class="ScrollableContent">
         <ng-template #contentQR let-modal>
             <div class="modal-header">
                 <h5 class="modal-title" id="my-modal-title">Buscar Artículo por QR</h5>

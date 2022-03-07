@@ -1,6 +1,7 @@
 export interface Articulo {
-    Nombre: string,
-    Descripcion: string,
-    Precio: number,
+    articulo: string,
+    descripcion1: string,
+    precioLista: number,
     Cantidad: number
+    
 }

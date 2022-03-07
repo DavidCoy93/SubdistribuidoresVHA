@@ -17,12 +17,12 @@
                     
                             <mat-form-field appearance="fill" class="linearlayout">
                                 <mat-label>Contraseña</mat-label>
-                                <input matInput [type]="hide ? 'password' : 'text'" formControlName="contrasena" required>
-                                <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-                                <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-                                </button>
+                                <input matInput type="password" formControlName="contrasena" required>
                                 <mat-error *ngIf="contrasena?.errors?.['required']">Ingrese la contraseña</mat-error>
                             </mat-form-field>
+                            <div fxLayout="row">
+                                <a (click)="restablecerContrasena()">Restablecer contraseña</a>
+                            </div>
                             <div fxLayout="row-reverse" fxFill>
                                 <button type="submit" [disabled]="loginForm.invalid" mat-raised-button color="warn" ngClass.xs="buttonSmallResolution" ngClass.sm="buttonSmallResolution">Entrar</button>
                             </div>

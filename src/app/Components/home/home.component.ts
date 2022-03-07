@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Articulo } from 'src/app/Models/Articulo';
@@ -63,6 +63,7 @@ export class HomeComponent implements OnInit {
   mostrarArticulos(): void {
     this.viewService.verArticulos.next(true);
     this.viewService.verCarrito.next(false);
+    this.router.navigate(["../home"]);
   }
 
   mostrarCarrito(): void {
@@ -72,25 +73,21 @@ export class HomeComponent implements OnInit {
 
   agregarArticuloCarrito(art: Articulo): void {
     
-    let ArticuloExistente = this.carritoArticulos.filter(articulo => articulo.Nombre === art.Nombre)[0];
+    let ArticuloExistente = this.carritoArticulos.filter(articulo => articulo.articulo === art.articulo)[0];
     if (ArticuloExistente === null || ArticuloExistente === undefined) {
       this.carritoArticulos.push(art)
     } else {
       this.carritoArticulos.forEach((articulo, indice) => {
-        if (articulo.Nombre === art.Nombre) {
+        if (articulo.articulo === art.articulo) {
           articulo.Cantidad += 1;
         }
       });
     }
-
-    this.http.get("http://ip-api.com/json/24.48.0.1").subscribe(resp => {
-      console.log(resp);
-    })
   }
 
   quitarArticuloCarrito(art: Articulo): void {
     for (let i = 0; i < this.carritoArticulos.length; i++) {
-      if(this.carritoArticulos[i].Nombre === art.Nombre) {
+      if(this.carritoArticulos[i].articulo === art.articulo) {
         this.carritoArticulos.splice(i, 1);
         break;
       }

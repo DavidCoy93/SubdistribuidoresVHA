@@ -24,6 +24,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatPaginatorIntlSpanish } from './Utilidades/spanish-paginator';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -35,7 +36,6 @@ import en from '@angular/common/locales/en';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ngxLoadingAnimationTypes, NgxLoadingModule } from 'ngx-loading';
 import { InterceptorService } from './Services/interceptor.service';
-
 
 registerLocaleData(en);
 
@@ -73,13 +73,14 @@ registerLocaleData(en);
     FlexLayoutModule,
     ZXingScannerModule,
     HttpClientModule,
-    NgxLoadingModule.forRoot({animationType: ngxLoadingAnimationTypes.circleSwish, primaryColour: 'red'})
+    NgxLoadingModule.forRoot({animationType: ngxLoadingAnimationTypes.circleSwish, primaryColour: 'red'}),
+    MatExpansionModule
   ],
   providers: [
     Title,
-    {provide: MatPaginatorIntl, useClass: MatPaginatorIntlSpanish},
+    { provide: MatPaginatorIntl, useClass: MatPaginatorIntlSpanish },
     { provide: NZ_I18N, useValue: en_US },
-    { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true}
+    { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }
   ],
   bootstrap: [AppComponent]
 })
