@@ -1,6 +1,8 @@
+<nz-page-header nzTitle="Articulos"></nz-page-header>
+
 <div fxLayout="row" >
     <div fxFlexOffset="5" fxFlex="90">
-        <mat-form-field class="example-form-field" appearance="fill" color="warn">
+        <mat-form-field class="example-form-field" appearance="standard">
             <mat-label>Buscar articulo</mat-label>
             <input matInput type="text" [(ngModel)]="textoBusqueda">
             <mat-icon matSuffix>search</mat-icon>
@@ -9,53 +11,87 @@
 </div>
 
 <div fxLayout="row" >
-    <div fxFlexOffset="5" fxFlex="90">
-        <mat-paginator [length]="listaArticulos.length" [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 50]" color="warn" (page)="cambiarPagina($event)">
+    <div fxFlexOffset="5" fxFlex="20">
+        <mat-form-field appearance="standard">
+        <mat-label>Familia</mat-label>
+        <mat-select [(ngModel)]="familiaSeleccionada" name="familia" (ngModelChange)="seleccionarArticulo($event)">
+            <mat-option *ngFor="let familia of familias" [value]="familia.familia">{{familia.familia}}</mat-option>
+        </mat-select>
+        </mat-form-field>
+    </div>
+    <div fxFlex="70">
+        <mat-paginator [length]="50" [pageSize]="tamanoPagina" [pageSizeOptions]="[5, 10, 25, 50]" color="warn" (page)="cambiarPagina($event)">
         </mat-paginator>
     </div>
 </div>
 
 <div fxHide.sm fxHide.xs fxShow.md fxShow.lg fxShow.xl fxLayout="row wrap" fxFill>
-    <div fxFlex="0 0 25" *ngFor="let articulo of listaArticulosPaginado" style="margin-top: 15px;">
+    <div fxFlex="0 0 25" *ngFor="let articulo of listaArticulos" style="margin-top: 15px;">
         <div fxLayout="row" fxFill>
             <div fxFlexOffset="15" fxFlex="70">
-                <mat-card>
-                    <mat-card-header>
-                        <mat-card-title>{{articulo.articulo}}</mat-card-title>
-                        <mat-card-subtitle *ngIf="subdistribuidor.esAdmin">${{articulo.precioLista}}</mat-card-subtitle>
-                    </mat-card-header>
-                    <img mat-card-image src="assets/img/piso-vitromex-napa-04352041320.jpg">
-                    <mat-card-content>
+                <nz-card [nzCover]="imagenArticulo" [nzActions]="[btnAgregar,btnVerDetalle]">
+                    <nz-card-meta *ngIf="usuario.esAdmin; else contenidoAgente" [nzTitle]="articulo.articulo" [nzDescription]="precioLista"></nz-card-meta>
+                    <ng-template #contenidoAgente>
+                        <nz-card-meta [nzTitle]="articulo.articulo"></nz-card-meta>
+                    </ng-template>
+                    <div class="descripcionArticulo">
                         {{articulo.descripcion1}}
-                    </mat-card-content>
-                    <mat-card-actions>
-                        <button mat-button>Carrito</button>
-                        <button mat-button (click)="verDetalleArticulo(articulo.articulo)">Ver</button>
-                    </mat-card-actions>
-                </mat-card>
+                    </div>
+                </nz-card>
+                <ng-template #precioLista>
+                    <b>{{articulo.precioLista | currency}}</b>
+                </ng-template>
+                <ng-template #imagenArticulo>
+                    <img src="assets/img/IMAGENES_MODULO_DE_VENTAS/CATO03_02.jpg">
+                </ng-template>
+                <ng-template #btnAgregar>
+                    <button mat-raised-button (click)="agregarArticulo(articulo)">
+                        <mat-icon>shopping_cart</mat-icon>
+                        <span> Agregar</span>
+                    </button>
+                </ng-template>
+                <ng-template #btnVerDetalle>
+                    <button mat-raised-button (click)="verDetalleArticulo(articulo.articulo)">
+                        <mat-icon>visibility</mat-icon>
+                        <span> Ver</span>
+                    </button>
+                </ng-template>
             </div>
         </div>
     </div>
 </div>
 
 <div fxShow.xs fxShow.sm fxHide.md fxHide.lg fxHide.xl fxLayout="row wrap" fxFill>
-    <div fxFlex="0 0 100" *ngFor="let articulo of listaArticulosPaginado" style="margin-top: 15px;">
+    <div fxFlex="0 0 100" *ngFor="let articulo of listaArticulos" style="margin-top: 15px;">
         <div fxLayout="row" fxFill>
             <div fxFlexOffset="15" fxFlex="70">
-                <mat-card>
-                    <mat-card-header>
-                        <mat-card-title>{{articulo.articulo}}</mat-card-title>
-                        <mat-card-subtitle *ngIf="subdistribuidor.esAdmin">${{articulo.precioLista}}</mat-card-subtitle>
-                    </mat-card-header>
-                    <img mat-card-image src="assets/img/piso-vitromex-napa-04352041320.jpg">
-                    <mat-card-content>
+                <nz-card [nzCover]="imagenArticulo" [nzActions]="[btnAgregar,btnVerDetalle]">
+                    <nz-card-meta *ngIf="usuario.esAdmin; else contenidoAgente" [nzTitle]="articulo.articulo" [nzDescription]="precioLista"></nz-card-meta>
+                    <ng-template #contenidoAgente>
+                        <nz-card-meta [nzTitle]="articulo.articulo"></nz-card-meta>
+                    </ng-template>
+                    <div class="descripcionArticulo">
                         {{articulo.descripcion1}}
-                    </mat-card-content>
-                    <mat-card-actions>
-                        <button mat-button>Carrito</button>
-                        <button (click)="verDetalleArticulo(articulo.articulo)" mat-button>Ver</button>
-                    </mat-card-actions>
-                </mat-card>
+                    </div>
+                </nz-card>
+                <ng-template #precioLista>
+                    <b>{{articulo.precioLista | currency}}</b>
+                </ng-template>
+                <ng-template #imagenArticulo>
+                    <img src="assets/img/IMAGENES_MODULO_DE_VENTAS/CATO03_02.jpg">
+                </ng-template>
+                <ng-template #btnAgregar>
+                    <button mat-raised-button (click)="agregarArticulo(articulo)">
+                        <mat-icon>shopping_cart</mat-icon>
+                        <span> Agregar</span>
+                    </button>
+                </ng-template>
+                <ng-template #btnVerDetalle>
+                    <button mat-raised-button (click)="verDetalleArticulo(articulo.articulo)">
+                        <mat-icon>visibility</mat-icon>
+                        <span> Ver</span>
+                    </button>
+                </ng-template>
             </div>
         </div>
     </div>

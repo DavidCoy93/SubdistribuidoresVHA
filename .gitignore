@@ -40,3 +40,6 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# imagenes Estaticas
+/src/assets/img/IMAGENES_MODULO_DE_VENTAS

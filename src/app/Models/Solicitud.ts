@@ -1,9 +1,7 @@
-import { Articulo } from 'src/app/Models/Articulo'
+import { Subdistribuidor } from "./Subdistribuidor";
+import { SubdistribuidorD } from "./SubdistribuidorD";
 
 export interface solicitud {
-    Id: number,
-    Agente: string,
-    Descripcion: string,
-    FechaEmision: Date,
-    Articulos: Articulo[]
+    encabezado: Subdistribuidor,
+    detalle: Array<SubdistribuidorD>
 }

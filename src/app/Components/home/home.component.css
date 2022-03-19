@@ -5,7 +5,7 @@
 }
 
 .mat-toolbar {
-    background-color: lightgrey;
+    background-color: white;
     color: #000;
 }
 
@@ -17,8 +17,9 @@
     font-size: medium;
 }
 
-.footer-home {
-    background-color: whitesmoke;
+.footer-home > .mat-toolbar {
+    background-color: #ff0000;
+    color: white;
 }
 
 .footer-home span {

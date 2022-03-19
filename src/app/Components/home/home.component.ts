@@ -7,8 +7,8 @@ import { CarritoComponent } from '../carrito/carrito.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogView } from '../notificacion/dialogView';
-import { HttpClient } from '@angular/common/http';
-import { ViewsService } from 'src/app/Services/views.service';
+import { SolicitudService } from 'src/app/Services/solicitud.service';
+import { GlobalsService } from 'src/app/Services/globals.service';
 
 @Component({
   selector: 'app-home',
@@ -34,21 +34,12 @@ export class HomeComponent implements OnInit {
       private modalService: NgbModal,
       private dialog: MatDialog,
       private route: ActivatedRoute,
-      private http: HttpClient,
-      private viewService: ViewsService) 
+      private globalService: GlobalsService,
+      public solicitudService: SolicitudService) 
     { 
       this.titleService.setTitle('Inicio');
-      // @ts-ignore
-      this.UsuarioObj = JSON.parse(localStorage.getItem('usuario'));
+      this.UsuarioObj = this.globalService.UsuarioLogueado;
       this.anio = new Date().getFullYear().toString();
-
-      this.viewService.verArticulos.subscribe(mostrarArticulos => {
-        this.verArticulos = mostrarArticulos;
-      });
-
-      this.viewService.verCarrito.subscribe(mostrarCarrito => {
-        this.verCarrito = mostrarCarrito;
-      });
     }
 
   ngOnInit(): void {
@@ -57,46 +48,11 @@ export class HomeComponent implements OnInit {
 
   cerrarSesion(): void {
     localStorage.removeItem('usuario');
-    this.router.navigate(['/login'])
+    this.router.navigate(['/login']);
   }
 
   mostrarArticulos(): void {
-    this.viewService.verArticulos.next(true);
-    this.viewService.verCarrito.next(false);
-    this.router.navigate(["../home"]);
-  }
-
-  mostrarCarrito(): void {
-    this.viewService.verArticulos.next(false);
-    this.viewService.verCarrito.next(true);
-  }
-
-  agregarArticuloCarrito(art: Articulo): void {
-    
-    let ArticuloExistente = this.carritoArticulos.filter(articulo => articulo.articulo === art.articulo)[0];
-    if (ArticuloExistente === null || ArticuloExistente === undefined) {
-      this.carritoArticulos.push(art)
-    } else {
-      this.carritoArticulos.forEach((articulo, indice) => {
-        if (articulo.articulo === art.articulo) {
-          articulo.Cantidad += 1;
-        }
-      });
-    }
-  }
-
-  quitarArticuloCarrito(art: Articulo): void {
-    for (let i = 0; i < this.carritoArticulos.length; i++) {
-      if(this.carritoArticulos[i].articulo === art.articulo) {
-        this.carritoArticulos.splice(i, 1);
-        break;
-      }
-    }
-    this.carritoChild.calcularTotalCarrito();
-  }
-
-  deshacerCambiosCarrito(): void {
-    this.carritoArticulos.splice(this.carritoArticulos.length -1, 1)
+    this.router.navigate(["/home"]);
   }
 
   abrirModalQR(contentQR: any): void {
@@ -111,7 +67,7 @@ export class HomeComponent implements OnInit {
   permisosCamara(otorgoPermiso: boolean): void {
     if(!otorgoPermiso) {
       this.modalService.dismissAll();
-      let dialogRef = this.dialog.open(DialogView, {
+      this.dialog.open(DialogView, {
         width: '400px',
         data: {titulo: 'Advertencia', mensaje: 'No perimitio el uso de la camara, por favor permita usar la camara'}
       })
@@ -122,7 +78,7 @@ export class HomeComponent implements OnInit {
     this.tieneCamaras = (camaras.length > 0) ? true : false;
     if(!this.tieneCamaras) {
       this.modalService.dismissAll();
-      let dialogRef = this.dialog.open(DialogView, {
+      this.dialog.open(DialogView, {
         width: '250px',
         data: {titulo: 'Error', mensaje: 'No se encontraron camaras en este dispositivo'}
       })

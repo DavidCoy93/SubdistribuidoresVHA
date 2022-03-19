@@ -1,35 +1,36 @@
+<nz-page-header [nzTitle]="articulo.descripcion1" nzBackIcon></nz-page-header>
 <div fxLayout.xs="column" fxLayout.sm="column" fxLayout.md="row" fxLayout.lg="row" fxLayout.xl="row" fxFill>
     <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="40" fxFlex.lg="40" fxFlex.xl="40">
         <div fxLayout="row" fxFill>
             <div fxFlexOffset.xs="30" fxFlex.xs="40" fxFlexOffset.sm="30" fxFlex.sm="40" fxFlexOffset.md="20" fxFlex.md="60" fxFlexOffset.lg="20" fxFlex.lg="60" fxFlexOffset.xl="20" fxFlex.xl="60">
                 <div fxShow.xs fxShow.sm fxHide.md fxHide.lg fxHide.xl fxLayout.xs="row" fxLayout.sm="row" fxFill class="img-articulo">
-                    <img src="assets/img/piso-vitromex-napa-04352041320.jpg" alt="">
+                    <img [src]="urlImagen" alt="">
                 </div>
                 <div fxHide.xs fxHide.sm fxShow.md fxShow.lg fxShow.xl fxLayout.md="column" fxLayout.lg="column" fxLayout.xl="column" fxFill>
                     <div fxFlexOffset.md="20" fxFlex.md="60" fxFlexOffset.lg="20" fxFlex.lg="60" fxFlexOffset.xl="20" fxFlex.xl="60" class="img-articulo">
-                        <img src="assets/img/piso-vitromex-napa-04352041320.jpg" alt="">
+                        <img [src]="urlImagen" alt="">
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="30" fxFlex.lg="30" fxFlex.xl="30" class="descripcion">
-        <div fxLayout="column" fxFill>
-            <div fxFlex="33.333333">
-                <p>{{idArticulo}}</p>
-            </div>
-            <div fxFlex="33.333333">
-                <p>Prueba_2</p>
-            </div>
-            <div fxFlex="33.333333">
-                <p>Prueba_3</p>
-            </div>
-        </div>
+    <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="30" fxFlex.lg="30" fxFlex.xl="30">
+        <nz-descriptions [nzTitle]="articulo.descripcion1" nzBordered [nzColumn]="{xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }">
+            <nz-descriptions-item nzTitle="SKU">{{articulo.articulo}}</nz-descriptions-item>
+            <nz-descriptions-item *ngIf="usuario.esAdmin" nzTitle="Precio"> <b>{{articulo.precioLista | currency}}</b></nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Unidad">{{articulo.unidad}}</nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Familia">{{articulo.familia}}</nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Fabricante">{{articulo.fabricante}}</nz-descriptions-item>
+        </nz-descriptions>
+        <button mat-raised-button [disabled]="articulo.rSaldoU.length === 0">
+            <mat-icon>shopping_cart</mat-icon>
+            <span> Agregar</span>
+        </button>
     </div>
     <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="30" fxFlex.lg="30" fxFlex.xl="30" class="disponibles">
         <div fxLayout="row" fxFill>
             <div fxFlexOffset="25" fxFlex="50">
-                <table class="table table-striped">
+                <table class="table table-striped" *ngIf="articulo.rSaldoU.length != 0; else NoDisponible">
                     <thead>
                         <tr>
                             <th>Almacen</th>
@@ -37,32 +38,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>CDG-500</td>
-                            <td>20</td>
-                        </tr>
-                        <tr>
-                            <td>CDG-500</td>
-                            <td>20</td>
-                        </tr>
-                        <tr>
-                            <td>CDG-500</td>
-                            <td>20</td>
-                        </tr>
-                        <tr>
-                            <td>CDG-500</td>
-                            <td>20</td>
-                        </tr>
-                        <tr>
-                            <td>CDG-500</td>
-                            <td>20</td>
-                        </tr>
-                        <tr>
-                            <td>CDG-500</td>
-                            <td>20</td>
+                        <tr *ngFor="let disponible of articulo.rSaldoU">
+                            <td>{{disponible.grupo}}</td>
+                            <td>{{disponible.saldoUU}}</td>
                         </tr>
                     </tbody>
                 </table>
+                <ng-template #NoDisponible>
+                    <nz-alert nzType="warning" nzMessage="No disponible" nzDescription="Por el momento no hay unidades disponibles" nzShowIcon></nz-alert>
+                </ng-template>
             </div>
         </div>
     </div>

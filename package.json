@@ -34,7 +34,6 @@
     "@zxing/library": "^0.19.1",
     "@zxing/ngx-scanner": "^3.5.0",
     "bootstrap": "^4.6.0",
-    "crypto-js": "^4.1.1",
     "ng-zorro-antd": "^13.0.1",
     "ngx-loading": "^13.0.0",
     "rxjs": "~7.5.0",

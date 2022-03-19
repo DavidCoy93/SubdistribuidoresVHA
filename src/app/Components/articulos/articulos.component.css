@@ -1,28 +1,25 @@
-.centerTable {
-    margin-left: 10%;
-    margin-right: 10%;
-}
-
 .mat-icon:hover {
     cursor: pointer;
-}
-
-.mat-row:hover {
-    background-color: yellow;
 }
 
 .mat-form-field {
     width: 100%;
 }
 
-table {
-    width: 100%;
+
+.descripcionArticulo {
+    height: 50px;
 }
 
-img:hover {
-    cursor: pointer;
+button.mat-raised-button {
+    background-color: #ff0000;
+    color: #fff;
 }
 
-mat-card:hover {
-    border: 1px solid red;
+button.mat-raised-button span {
+    font-size: 8pt;
+}
+
+nz-card:hover {
+    border: solid 3px #ff0000;
 }

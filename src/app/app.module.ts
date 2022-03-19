@@ -36,6 +36,19 @@ import en from '@angular/common/locales/en';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ngxLoadingAnimationTypes, NgxLoadingModule } from 'ngx-loading';
 import { InterceptorService } from './Services/interceptor.service';
+import { NzBackTopModule } from 'ng-zorro-antd/back-top';
+import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
+import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzCarouselModule } from 'ng-zorro-antd/carousel';
+import { MatRadioModule, MAT_RADIO_DEFAULT_OPTIONS } from '@angular/material/radio';
+import { NzResultModule } from 'ng-zorro-antd/result';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzMessageModule } from 'ng-zorro-antd/message';
+import { NzTagModule }  from 'ng-zorro-antd/tag';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 registerLocaleData(en);
 
@@ -74,13 +87,27 @@ registerLocaleData(en);
     ZXingScannerModule,
     HttpClientModule,
     NgxLoadingModule.forRoot({animationType: ngxLoadingAnimationTypes.circleSwish, primaryColour: 'red'}),
-    MatExpansionModule
+    MatExpansionModule,
+    NzBackTopModule,
+    NzPageHeaderModule,
+    NzDescriptionsModule,
+    NzAlertModule,
+    NzCarouselModule,
+    MatRadioModule,
+    NzResultModule,
+    NzButtonModule,
+    NzCardModule,
+    NzIconModule,
+    NzMessageModule,
+    NzTagModule,
+    NzSelectModule
   ],
   providers: [
     Title,
     { provide: MatPaginatorIntl, useClass: MatPaginatorIntlSpanish },
     { provide: NZ_I18N, useValue: en_US },
-    { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
+    { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'warn' }}
   ],
   bootstrap: [AppComponent]
 })

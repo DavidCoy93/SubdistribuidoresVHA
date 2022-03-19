@@ -1,7 +1,7 @@
 <div fxLayout="column" fxFill>
 
     <div fxFlex="10">
-        <mat-toolbar fxLayout="row">
+        <mat-toolbar fxLayout="row" class="mat-elevation-z5">
             <div fxShow.xs fxShow.sm fxFlex.xs="10" fxFlex.sm="10" fxHide.lg fxHide.md fxHide.xl [matMenuTriggerFor]="responsiveMenu">
                 <button mat-icon-button aria-label="menu">
                     <mat-icon>menu</mat-icon>
@@ -14,22 +14,18 @@
                 </mat-menu>
             </div>
             
-            <img (click)="mostrarArticulos()" fxFlex.xs="30" fxFlex.sm="20" fxFlex.md="15" fxFlex.lg="10" class="logo" src="assets/img/Logotipo_C.png" alt="">
+            <img (click)="mostrarArticulos()" matTooltip="Volver al inicio" fxFlex.xs="30" fxFlex.sm="20" fxFlex.md="15" fxFlex.lg="10" class="logo" src="assets/img/Logotipo_C.png" alt="">
             
             <div fxHide.xs fxHide.sm fxFlexOffset.md="15" fxFlexOffset.lg="20" fxFlex.md="40" fxFlex.lg="40">
                 <a mat-button (click)="abrirModalQR(contentQR)">
                     <mat-icon>qr_code_2</mat-icon>
                     <span>Buscar por QR</span>
                 </a>
-                <a mat-button>
-                    <mat-icon>add_circle</mat-icon>
-                    <span>Nueva Solicitud</span>
-                </a>
             </div>
         
             <div fxFlexOffset.xs="40" fxFlexOffset.sm="50" fxFlex.xs="10" fxFlex.sm="10"  fxFlex.xs="" fxFlex.md="20" fxFlex.lg="20">
                 <button  mat-icon-button aria-label="boton usuario" [matMenuTriggerFor]="menuUsuario">
-                    <mat-icon>account_circle</mat-icon> <span fxHide.xs fxHide.sm>{{UsuarioObj.correo}}</span>
+                    <mat-icon>account_circle</mat-icon> <span fxHide.xs fxHide.sm>{{UsuarioObj.cliente?.nombre}}</span>
                 </button>
                 <mat-menu #menuUsuario>
                     <button mat-menu-item (click)="cerrarSesion()">
@@ -39,13 +35,13 @@
                 </mat-menu>
             </div>
         
-            <button fxFlex.md="10" fxFlex.lg="10" mat-icon-button aria-label="Boton carrito de compra" (click)="mostrarCarrito()">
-                <mat-icon [matBadge]="carritoArticulos.length" matBadgeSize="small" matBadgeColor="accent" matTooltip="Ver carrito">shopping_cart</mat-icon>
+            <button fxFlex.md="10" fxFlex.lg="10" mat-icon-button aria-label="Boton carrito de compra" routerLink="./carrito">
+                <mat-icon [matBadge]="solicitudService.solicitudOC.detalle.length" matBadgeSize="small" matBadgeColor="accent" matTooltip="Ver carrito">shopping_cart</mat-icon>
             </button>
         </mat-toolbar>
     </div>
 
-    <div fxFlex="80" class="ScrollableContent">
+    <div fxFlex="80" class="ScrollableContent" #TopDiv>
         <ng-template #contentQR let-modal>
             <div class="modal-header">
                 <h5 class="modal-title" id="my-modal-title">Buscar Artículo por QR</h5>
@@ -68,17 +64,13 @@
                 <button type="button" class="btn btn-dark" (click)="modal.close('Close click')">Cerrar</button>
             </div>
         </ng-template>
-        
-        
-        <app-articulos *ngIf=verArticulos [subdistribuidor]="UsuarioObj" (deshacer)="deshacerCambiosCarrito()" (agregar)="agregarArticuloCarrito($event)"></app-articulos>
-        <app-carrito *ngIf=verCarrito (quitar)="quitarArticuloCarrito($event)" [carrito]=carritoArticulos></app-carrito>
-
         <router-outlet></router-outlet>
+        <nz-back-top [nzTarget]="TopDiv" [nzVisibilityHeight]="500" [nzDuration]="3000"></nz-back-top>
     </div>
 
     <div fxFlex="10" class="footer-home">
         <mat-toolbar>
-            <span>©VitroHogar {{ anio }}</span>
+            <span>®VitroHogar {{ anio }}</span>
         </mat-toolbar>
     </div>
 </div>

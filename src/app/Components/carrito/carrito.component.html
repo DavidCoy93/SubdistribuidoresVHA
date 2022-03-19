@@ -1,75 +1,125 @@
-<!-- <div class="container mt-3" *ngIf="carrito.length === 0">
-    <div class="row">
-        <div class="offset-md-3 col-md-6">
-            <div class="alert alert-primary text-center" role="alert">
-                En este momento no tienes articulos en tu carrito
+<nz-page-header nzTitle="Orden de Compra"  nzBackIcon>
+    <nz-page-header-tags>
+        <nz-tag nzColor="processing">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
+    </nz-page-header-tags>
+    <nz-page-header-extra>
+        <nz-select nzPlaceHolder="Almacen" [(ngModel)]="almacenSolicitud" (ngModelChange)="seleccionarAlmacen($event)">
+            <nz-option nzValue="1" nzLabel="CDG-100"></nz-option>
+        </nz-select>
+    </nz-page-header-extra>
+</nz-page-header>
+
+<div fxLayout="row">
+    <div fxFlexOffset="10" fxFlex="80">
+        <nz-result nzStatus="warning" nzTitle="Aun no has agregado articulos a la solicitud" *ngIf="solicitudService.solicitudOC.detalle.length === 0; else ContenidoCarrito">
+            <div nz-result-extra>
+                <button nz-button nzType="primary" routerLink="..">Regresar</button>
             </div>
-        </div>
+        </nz-result>
+        <ng-template #ContenidoCarrito>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Articulo</th>
+                            <th>Descripcion</th>
+                            <th class="centrarTexto" *ngIf="usuario.esAdmin">Precio</th>
+                            <th class="centrarTexto">Cantidad</th>
+                            <th class="centrarTexto">Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let articulo of solicitudService.solicitudOC.detalle">
+                            <td>{{articulo.articulo}}</td>
+                            <td>{{articulo.descripcion}}</td>
+                            <td *ngIf="usuario.esAdmin" class="centrarTexto">{{articulo.precio | currency}}</td>
+                            <td class="centrarTexto"><input style="width: 50px;" type="number" [(ngModel)]="articulo.cantidad" (change)="solicitudService.calcularImporte()"></td>
+                            <td class="centrarTexto">
+                                <mat-icon matTooltip="Quitar" (click)="solicitudService.quitarDetalleSolicitud(articulo)">delete</mat-icon>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </ng-template>
     </div>
 </div>
-<div class="container mt-3" *ngIf="carrito.length > 0" >
-    <div class="row">
-        <div class="offset-md-3 col-md-6">
-            <table class="table table-striped">
-                <thead class="thead-dark">
-                    <tr class="text-center">
-                        <th>Imagen</th>
-                        <th>Articulo</th>
-                        <th>Precio</th>
-                        <th>Cantidad</th>
-                        <th>Opciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="text-center" *ngFor="let articulo of carrito">
-                        <td>
-                            <img [src]="urlImages" alt="Articulo">
-                        </td>
-                        <td>{{articulo.Nombre}}</td>
-                        <td>{{articulo.Precio}}</td>
-                        <td>
-                            <input class="form-control" type="number" min="1" (change)="calcularTotalCarrito()" [(ngModel)]="articulo.Cantidad">
-                        </td>
-                        <td>
-                            <fa-icon [icon]="deleteIcon" class="fa-lg" matTooltip="Quitar" (click)="QuitarArticulo(articulo)"></fa-icon>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
+<ng-container *ngIf="solicitudService.solicitudOC.detalle.length > 0 && usuario.esAdmin">
+    <div fxLayout="row">
+        <div fxFlexOffset.xs="10" fxFlex.xs="80" fxFlexOffset.sm="10" fxFlex.sm="80"  fxFlexOffset.lg="60" fxFlex.lg="30" fxFlexOffset.xl="60" fxFlex.xl="30" class="totalEncabezado">
+            <span>Total del carrito</span>
         </div>
     </div>
-    <div class="row">
-        <div class="offset-md-3 col-md-6">
-            <div class="alert alert-primary" role="alert">
-                <div class="col-md-12">
-                    <div class="offset-md-10">
-                        <b>Total: ${{Total}}</b> 
+    
+    <div fxLayout="row">
+        <div fxFlexOffset.xs="10" fxFlex.xs="80" fxFlexOffset.sm="10" fxFlex.sm="80"  fxFlexOffset.lg="60" fxFlex.lg="30" fxFlexOffset.xl="60" fxFlex.xl="30">
+            <div fxLayout="row" fxFill class="concepto">
+                <div fxFlex="50">
+                    <div fxLayout="row" fxFill>
+                        <div fxFlexOffset="10" fxFlex="30">
+                            <span>Importe</span>        
+                        </div>
+                    </div>
+                </div>
+                <div fxFlex="50">
+                    <div fxLayout="row" fxFill>
+                        <div fxFlex="80" class="monto">
+                            <span>{{solicitudService.solicitudOC.encabezado.importe | currency}}</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div> -->
-
-
-<div fxLayout="row" fxFill>
-    <div fxFlexOffset="10" fxFlex="80">
-        <mat-accordion multi>
-            <mat-expansion-panel *ngFor="let solicitud of solicitudes">
-                <mat-expansion-panel-header>
-                    <mat-panel-title>{{solicitud.Id}}</mat-panel-title>
-                    <mat-panel-description>
-                        {{solicitud.Descripcion}}
-                        {{solicitud.FechaEmision | date: "dd/MM/YYYY"}}
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-                <div *ngFor="let articulo of solicitud.Articulos">
-                    <p>{{articulo.articulo}}</p>
-                    <p>{{articulo.descripcion1}}</p>
+    
+    <div fxLayout="row">
+        <div fxFlexOffset.xs="10" fxFlex.xs="80" fxFlexOffset.sm="10" fxFlex.sm="80"  fxFlexOffset.lg="60" fxFlex.lg="30" fxFlexOffset.xl="60" fxFlex.xl="30">
+            <div fxLayout="row" fxFill class="concepto">
+                <div fxFlex="50">
+                    <div fxLayout="row" fxFill>
+                        <div fxFlexOffset="10" fxFlex="30">
+                            <span>Impuestos</span>      
+                        </div>
+                    </div>
                 </div>
-            </mat-expansion-panel>
-        </mat-accordion>
+                <div fxFlex="50">
+                    <div fxLayout="row" fxFill>
+                        <div fxFlex="80" class="monto">
+                            <span>{{ solicitudService.solicitudOC.encabezado.impuestos | currency}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-
-
+    
+    <div fxLayout="row">
+        <div fxFlexOffset.xs="10" fxFlex.xs="80" fxFlexOffset.sm="10" fxFlex.sm="80"  fxFlexOffset.lg="60" fxFlex.lg="30" fxFlexOffset.xl="60" fxFlex.xl="30">
+            <div fxLayout="row" fxFill class="concepto">
+                <div fxFlexOffset="5" fxFlex="85" class="separador"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div fxLayout="row">
+        <div fxFlexOffset.xs="10" fxFlex.xs="80" fxFlexOffset.sm="10" fxFlex.sm="80"  fxFlexOffset.lg="60" fxFlex.lg="30" fxFlexOffset.xl="60" fxFlex.xl="30">
+            <div fxLayout="row" fxFill class="totalSolicitud">
+                <div fxFlex="50">
+                    <div fxLayout="row" fxFill>
+                        <div fxFlexOffset="10" fxFlex="30">
+                            <span>Total</span>      
+                        </div>
+                    </div>
+                </div>
+                <div fxFlex="50">
+                    <div fxLayout="row" fxFill>
+                        <div fxFlex="80" class="monto">
+                            <span>{{ solicitudService.solicitudOC.encabezado.importe + solicitudService.solicitudOC.encabezado.impuestos | currency}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>
