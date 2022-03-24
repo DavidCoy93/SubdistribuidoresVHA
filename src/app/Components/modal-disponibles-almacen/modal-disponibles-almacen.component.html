@@ -1,0 +1,30 @@
+<div fxLayout="row" fxFill>
+    <div fxFlexOffset="10" fxFlex="80">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Almacen</th>
+                    <th>Disponible</th>
+                </tr>
+            </thead>
+            <tbody #tbodyArticulos>
+                <!-- <tr *ngFor="let disponible of disponiblesAlmacen">
+                    <td>{{disponible.grupo}}</td>
+                    <td>{{disponible.saldoUU}}</td>
+                </tr> -->
+                <tr (click)="seleccionar(0)">
+                    <td>CDG-100</td>
+                    <td>2</td>
+                </tr>
+                <tr (click)="seleccionar(1)">
+                    <td>AYU-100</td>
+                    <td>2</td>
+                </tr>
+                <tr (click)="seleccionar(2)">
+                    <td>ZAC-100</td>
+                    <td>2</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

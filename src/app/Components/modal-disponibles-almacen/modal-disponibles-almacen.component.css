@@ -1,0 +1,19 @@
+.table thead tr {
+    background-color: #ff0000;
+    color: white;
+    text-align: center;
+}
+
+.table tbody tr {
+    text-align: center;
+}
+
+.table tbody tr:hover {
+    background-color: yellow;
+    cursor: pointer;
+}
+
+.seleccionado {
+    background-color: yellow !important;
+    font-weight: bolder;
+}

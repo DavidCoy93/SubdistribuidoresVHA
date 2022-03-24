@@ -88,4 +88,8 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  verSolicitudesAgentes(): void {
+    this.router.navigate(['./solicitudes'], {relativeTo: this.route});
+  }
+
 }

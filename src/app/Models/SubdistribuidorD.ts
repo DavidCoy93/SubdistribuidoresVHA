@@ -1,7 +1,7 @@
 export interface SubdistribuidorD {
     id?: number|null,
     renglon?: number|null,
-    articulo?: string|null,
+    articulo?: string,
     descripcion?: string|null,
     cantidad: number,
     pendiente?: number|null,
@@ -11,5 +11,6 @@ export interface SubdistribuidorD {
     impuesto?: number|null,
     descuento?: number|null,//valor calculado
     porcentajeDescuento?: number|null, //porcentaje
-    observaciones?: string|null
+    observaciones?: string|null,
+    disponible?: number
 }

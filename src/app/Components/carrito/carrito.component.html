@@ -3,15 +3,15 @@
         <nz-tag nzColor="processing">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
     </nz-page-header-tags>
     <nz-page-header-extra>
-        <nz-select nzPlaceHolder="Almacen" [(ngModel)]="almacenSolicitud" (ngModelChange)="seleccionarAlmacen($event)">
-            <nz-option nzValue="1" nzLabel="CDG-100"></nz-option>
-        </nz-select>
+        <button mat-raised-button *ngIf="solicitudService.solicitudOC.detalle.length > 0" (click)="solicitudService.enviarOrdenCompra()">
+            <span >{{ (usuario.esAdmin) ? 'Enviar orden de compra' : 'Enviar solicitud' }}</span>
+        </button>
     </nz-page-header-extra>
 </nz-page-header>
 
 <div fxLayout="row">
     <div fxFlexOffset="10" fxFlex="80">
-        <nz-result nzStatus="warning" nzTitle="Aun no has agregado articulos a la solicitud" *ngIf="solicitudService.solicitudOC.detalle.length === 0; else ContenidoCarrito">
+        <nz-result nzStatus="warning" nzTitle="Aun no has agregado articulos a la orden" *ngIf="solicitudService.solicitudOC.detalle.length === 0; else ContenidoCarrito">
             <div nz-result-extra>
                 <button nz-button nzType="primary" routerLink="..">Regresar</button>
             </div>
@@ -23,17 +23,31 @@
                         <tr>
                             <th>Articulo</th>
                             <th>Descripcion</th>
-                            <th class="centrarTexto" *ngIf="usuario.esAdmin">Precio</th>
+                            <th class="centrarTexto">Unidad</th>
+                            <th class="centrarTexto">Disponible</th>
                             <th class="centrarTexto">Cantidad</th>
+                            <th class="centrarTexto" *ngIf="usuario.esAdmin">Precio</th>
+                            <th class="centrarTexto">Almacén</th>
                             <th class="centrarTexto">Opciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let articulo of solicitudService.solicitudOC.detalle">
+                        <tr *ngFor="let articulo of solicitudService.solicitudOC.detalle; let indice = index">
                             <td>{{articulo.articulo}}</td>
                             <td>{{articulo.descripcion}}</td>
+                            <td class="centrarTexto">{{articulo.unidad}}</td>
+                            <td class="centrarTexto">{{articulo.disponible}}</td>
+                            <td class="centrarTexto">
+                                <!-- <input style="width: 50px;" type="number" [max]="(articulo.disponible === undefined) ? 0 : articulo.disponible" min="0" [(ngModel)]="articulo.cantidad" (change)="solicitudService.calcularImporte()"> -->
+                                <input style="width: 50px;" type="number" [(ngModel)]="articulo.cantidad" (change)="solicitudService.calcularImporte()">
+                            </td>
                             <td *ngIf="usuario.esAdmin" class="centrarTexto">{{articulo.precio | currency}}</td>
-                            <td class="centrarTexto"><input style="width: 50px;" type="number" [(ngModel)]="articulo.cantidad" (change)="solicitudService.calcularImporte()"></td>
+                            <td class="centrarTexto" *ngIf="articulo.almacen !== undefined; else agregarAlmacen">{{articulo.almacen}}</td>
+                            <ng-template #agregarAlmacen>
+                                <td class="centrarTexto">
+                                    <mat-icon matTooltip="Seleccionar Almacen" (click)="verDisponibles(articulo, indice)">add_circle_outline</mat-icon>
+                                </td>
+                            </ng-template>
                             <td class="centrarTexto">
                                 <mat-icon matTooltip="Quitar" (click)="solicitudService.quitarDetalleSolicitud(articulo)">delete</mat-icon>
                             </td>
@@ -48,7 +62,7 @@
 <ng-container *ngIf="solicitudService.solicitudOC.detalle.length > 0 && usuario.esAdmin">
     <div fxLayout="row">
         <div fxFlexOffset.xs="10" fxFlex.xs="80" fxFlexOffset.sm="10" fxFlex.sm="80"  fxFlexOffset.lg="60" fxFlex.lg="30" fxFlexOffset.xl="60" fxFlex.xl="30" class="totalEncabezado">
-            <span>Total del carrito</span>
+            <span>Total de la orden</span>
         </div>
     </div>
     

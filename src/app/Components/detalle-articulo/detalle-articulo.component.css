@@ -28,3 +28,8 @@ button.mat-raised-button {
     margin-bottom: 10px;
     width: 100%;
 }
+
+.almacenSeleccionado {
+    font-weight: bolder !important;
+    background-color: yellow !important;
+}

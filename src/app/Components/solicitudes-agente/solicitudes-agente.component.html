@@ -1,0 +1,94 @@
+<nz-page-header nzTitle="Solicitudes de orden de compra por autorizar" nzBackIcon>
+</nz-page-header>
+<div fxLayout="row">
+    <div fxFlexOffset="10" fxFlex="20">
+        <mat-form-field appearance="standard">
+            <mat-label>Agente</mat-label>
+            <mat-select [(ngModel)]="agente" name="almacenOC">
+                <mat-option value="1">Agente 1</mat-option>
+                <mat-option value="2">Agente 2</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</div>
+<div fxLayout="row">
+    <div fxFlexOffset="10" fxFlex="80">
+        <mat-accordion multi>
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Solicitud 1</mat-panel-title>
+                    <mat-panel-description>
+                        <div fxLayout="row" fxFill>
+                            <div fxFlex="95">
+                                descripcion 1
+                            </div>
+                            <div fxFlex="5">
+                                <mat-checkbox color="warn"></mat-checkbox>
+                            </div>
+                        </div>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Articulo</th>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let detalle of detalleSolicitud">
+                                <td>{{ detalle.articulo }}</td>
+                                <td>{{ detalle.descripcion }}</td>
+                                <td>{{ detalle.cantidad }}</td>
+                                <td>{{ detalle.precio| currency }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </mat-expansion-panel>
+
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Solicitud 1</mat-panel-title>
+                    <mat-panel-description>
+                        <div fxLayout="row" fxFill>
+                            <div fxFlex="95">
+                                descripcion 1
+                            </div>
+                            <div fxFlex="5">
+                                <mat-checkbox color="warn"></mat-checkbox>
+                            </div>
+                        </div>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Articulo</th>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let detalle of detalleSolicitud">
+                                <td>{{ detalle.articulo }}</td>
+                                <td>{{ detalle.descripcion }}</td>
+                                <td>{{ detalle.cantidad }}</td>
+                                <td>{{ detalle.precio| currency }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>

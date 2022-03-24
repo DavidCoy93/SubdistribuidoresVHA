@@ -58,3 +58,8 @@ mat-icon {
 .totalSolicitud span {
     font-weight: 700;
 }
+
+button.mat-raised-button {
+    background-color: #ff0000 !important;
+    color: #fff;
+}

@@ -22,7 +22,7 @@
             <nz-descriptions-item nzTitle="Familia">{{articulo.familia}}</nz-descriptions-item>
             <nz-descriptions-item nzTitle="Fabricante">{{articulo.fabricante}}</nz-descriptions-item>
         </nz-descriptions>
-        <button mat-raised-button [disabled]="articulo.rSaldoU.length === 0">
+        <button mat-raised-button [disabled]="articulo.rSaldoU.length === 0" (click)="agregarArticulo()">
             <mat-icon>shopping_cart</mat-icon>
             <span> Agregar</span>
         </button>
@@ -37,8 +37,8 @@
                             <th>Disponible</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr *ngFor="let disponible of articulo.rSaldoU">
+                    <tbody #tbodyDetalle>
+                        <tr *ngFor="let disponible of articulo.rSaldoU; let indice = index" (click)="seleccionarAlmacen(indice, disponible)">
                             <td>{{disponible.grupo}}</td>
                             <td>{{disponible.saldoUU}}</td>
                         </tr>

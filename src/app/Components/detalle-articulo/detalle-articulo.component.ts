@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Articulo } from 'src/app/Models/Articulo';
 import { GlobalsService } from 'src/app/Services/globals.service';
@@ -7,6 +7,8 @@ import { Usuario } from 'src/app/Models/Usuario';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogView } from '../notificacion/dialogView';
 import { Title } from '@angular/platform-browser';
+import { SolicitudService } from 'src/app/Services/solicitud.service';
+import { SaldoU } from 'src/app/Models/SaldoU';
 
 
 @Component({
@@ -21,7 +23,9 @@ export class DetalleArticuloComponent implements OnInit {
   articulo: Articulo = {articulo: '', descripcion1: '', precioLista: 0, Cantidad: 1, rSaldoU: []};
   urlImagen: string = '\\\\192.168.1.230\\Img-Intelisis$\\IMAGENES_MODULO_DE_VENTAS\\';
   imagenesArticulo: string[] = [];
-  
+  almacenSeleccionado?: SaldoU = undefined;
+
+  @ViewChild('tbodyDetalle') detalleBody!: ElementRef;
 
   constructor(
     private route: ActivatedRoute, 
@@ -29,7 +33,8 @@ export class DetalleArticuloComponent implements OnInit {
     private globalService: GlobalsService,
     private http: HttpClient,
     private dialog: MatDialog,
-    private titleService: Title) 
+    private titleService: Title,
+    private solicitudService: SolicitudService) 
   { 
     this.idArticulo = this.route.snapshot.paramMap.get('id');
     //@ts-ignore
@@ -73,6 +78,26 @@ export class DetalleArticuloComponent implements OnInit {
   public ngOnInit(): void {
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     window.scrollTo(0,0);
+  }
+
+  agregarArticulo(): void {
+    if(this.almacenSeleccionado === undefined) {
+      this.dialog.open(DialogView, {
+        width: '300px',
+        data: {titulo: 'Alerta', mensaje: 'Por favor seleccione un almacén de la tabla'}
+      })
+    } else {
+      this.solicitudService.agregarDetalleSolicitud(this.articulo, this.almacenSeleccionado);
+    }
+    
+  }
+
+  seleccionarAlmacen(indice: number, almacen: SaldoU): void { 
+    for (let i = 0; i < this.detalleBody.nativeElement.rows.length; i++) {
+      this.detalleBody.nativeElement.rows[i].classList.remove('almacenSeleccionado');
+    }
+    this.detalleBody.nativeElement.rows[indice].classList.add('almacenSeleccionado');
+    this.almacenSeleccionado = almacen;
   }
 
 }

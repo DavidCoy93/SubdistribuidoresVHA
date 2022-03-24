@@ -4,7 +4,7 @@
     <div fxFlexOffset="5" fxFlex="90">
         <mat-form-field class="example-form-field" appearance="standard">
             <mat-label>Buscar articulo</mat-label>
-            <input matInput type="text" [(ngModel)]="textoBusqueda">
+            <input matInput type="text" [(ngModel)]="textoBusqueda" (change)="buscarArticulos()">
             <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
     </div>

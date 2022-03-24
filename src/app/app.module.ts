@@ -22,7 +22,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule, MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatPaginatorIntlSpanish } from './Utilidades/spanish-paginator';
@@ -49,6 +49,10 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzTagModule }  from 'ng-zorro-antd/tag';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { SolicitudesAgenteComponent } from './Components/solicitudes-agente/solicitudes-agente.component';
+import { ModalDisponiblesAlmacenComponent } from './Components/modal-disponibles-almacen/modal-disponibles-almacen.component';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 registerLocaleData(en);
 
@@ -60,7 +64,9 @@ registerLocaleData(en);
     ArticulosComponent,
     CarritoComponent,
     DialogView,
-    DetalleArticuloComponent
+    DetalleArticuloComponent,
+    SolicitudesAgenteComponent,
+    ModalDisponiblesAlmacenComponent
   ],
   imports: [
     BrowserModule,
@@ -100,7 +106,9 @@ registerLocaleData(en);
     NzIconModule,
     NzMessageModule,
     NzTagModule,
-    NzSelectModule
+    NzSelectModule,
+    NzModalModule,
+    MatCheckboxModule
   ],
   providers: [
     Title,

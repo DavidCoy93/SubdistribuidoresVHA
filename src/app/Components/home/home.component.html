@@ -28,11 +28,16 @@
                     <mat-icon>account_circle</mat-icon> <span fxHide.xs fxHide.sm>{{UsuarioObj.cliente?.nombre}}</span>
                 </button>
                 <mat-menu #menuUsuario>
+                    <button mat-menu-item (click)="verSolicitudesAgentes()" *ngIf="UsuarioObj.esAdmin">
+                        <mat-icon>article</mat-icon>
+                        <span>Solicitudes Agentes</span>
+                    </button>
                     <button mat-menu-item (click)="cerrarSesion()">
                         <mat-icon>logout</mat-icon>
                         <span>Cerrar sesión</span>
                     </button>
                 </mat-menu>
+
             </div>
         
             <button fxFlex.md="10" fxFlex.lg="10" mat-icon-button aria-label="Boton carrito de compra" routerLink="./carrito">
