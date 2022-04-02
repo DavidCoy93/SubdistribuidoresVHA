@@ -45,6 +45,12 @@ export class LoginComponent {
         next: data => {
           UsuarioLogin.token = data.token;
           UsuarioLogin.cliente = data.cliente;
+          UsuarioLogin.agente = data.agente;
+          UsuarioLogin.usuario = data.usuario;
+          UsuarioLogin.urlAPI = data.urlAPI;
+          UsuarioLogin.success = data.success;
+          UsuarioLogin.errors = data.errors;
+          UsuarioLogin.esAdmin = (UsuarioLogin.cliente !== null) ? true : false;
           localStorage.setItem('usuario', JSON.stringify(UsuarioLogin));
           location.reload();
         },

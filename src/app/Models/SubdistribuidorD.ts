@@ -1,10 +1,10 @@
 export interface SubdistribuidorD {
     id?: number|null,
-    renglon?: number|null,
+    renglon: number,
     articulo?: string,
     descripcion?: string|null,
     cantidad: number,
-    pendiente?: number|null,
+    pendiente: number,
     unidad?: string|null,
     almacen?: string|null,
     precio: number,

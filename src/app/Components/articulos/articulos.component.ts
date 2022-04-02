@@ -1,9 +1,11 @@
+import { Location } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalService } from 'ng-zorro-antd/modal';
 import { ArtFam } from 'src/app/Models/ArtFam';
 import { Articulo } from 'src/app/Models/Articulo';
 import { Usuario } from 'src/app/Models/Usuario';
@@ -25,20 +27,21 @@ export class ArticulosComponent {
   tamanoPagina: number = 5;
   usuario: Usuario = {}
   familiaSeleccionada: string = 'TODAS';
-
   ParametrosBusqueda = new FormData();
+  imgNoDisponible = 'assets/img/Imagen no disponible_B.jpg';
 
 
   constructor(
     //private _snackBar: MatSnackBar, 
-    private _globalService: GlobalsService, 
+    public _globalService: GlobalsService, 
     private router: Router,
     private route: ActivatedRoute,
     private http: HttpClient,
     private solicitudService: SolicitudService,
-    private titleService: Title) {
+    private titleService: Title,
+    private modalService: NzModalService) {
 
-    titleService.setTitle('Inicio');
+    this.titleService.setTitle('Inicio');
     this.usuario = this._globalService.UsuarioLogueado;
 
     this.http.get<ArtFam[]>(this._globalService.urlAPI + 'ArtsFams', 
@@ -50,6 +53,15 @@ export class ArticulosComponent {
     ).subscribe({
       next: data => {
         this.familias = data;
+        this.familias.unshift({
+          clave: '-1',
+          familia: 'TODAS',
+          familiaMaestra: '',
+          icono: 0,
+          precios: false,
+          rClaveProdServ: undefined
+        })
+        this.familiaSeleccionada = this._globalService.familiaArticulo;
       },
       error: err => {
         alert("Ocurrio un error al obtener las familias");
@@ -58,9 +70,10 @@ export class ArticulosComponent {
 
     this.ParametrosBusqueda.append("IgnorarPrimeros", this.ignorarLosPrimeros.toString());
     this.ParametrosBusqueda.append("CantidadFilas", this.tamanoPagina.toString());
-    this.ParametrosBusqueda.append("Busqueda", this.textoBusqueda);
-    this.ParametrosBusqueda.append("Familia", "TODAS");
-    this.ParametrosBusqueda.append("Cliente", "");
+    this.ParametrosBusqueda.append("Busqueda", "");
+    this.ParametrosBusqueda.append("Familia", this._globalService.familiaArticulo);
+    //@ts-ignore
+    this.ParametrosBusqueda.append("Cliente", this.usuario.cliente?.cliente);
 
     this.http.post<Articulo[]>(this._globalService.urlAPI + 'Articulos/ArticulosPorBusquedaFiltrosPaginacion', this.ParametrosBusqueda, 
       { 
@@ -81,20 +94,13 @@ export class ArticulosComponent {
     });
   }
 
-  // MostrarSnackBar(mensaje: string, articulo: Articulo): void {
-  //   let snackBarRef = this._snackBar.open(mensaje, 'Deshacer', { duration: 5000 });
-  //   this.agregar.emit(articulo);
-  //   snackBarRef.onAction().subscribe(() => {
-  //     this.deshacer.emit();
-  //   })
-  // }
-
   buscarArticulos(): void {
     this.ParametrosBusqueda.set("IgnorarPrimeros", this.ignorarLosPrimeros.toString());
     this.ParametrosBusqueda.set("CantidadFilas", this.tamanoPagina.toString());
     this.ParametrosBusqueda.set("Busqueda", this.textoBusqueda);
     this.ParametrosBusqueda.set("Familia", this.familiaSeleccionada);
-    this.ParametrosBusqueda.set("Cliente", "");
+    //@ts-ignore
+    this.ParametrosBusqueda.set("Cliente", this.usuario.cliente?.cliente);
 
     this.http.post<Articulo[]>(this._globalService.urlAPI + 'Articulos/ArticulosPorBusquedaFiltrosPaginacion', this.ParametrosBusqueda, 
       { 
@@ -125,12 +131,28 @@ export class ArticulosComponent {
     this.buscarArticulos();
   }
 
-
-  seleccionarArticulo(fam: string): void {
+  seleccionarFamilia(fam: string): void {
+    this._globalService.familiaArticulo = this.familiaSeleccionada;
     this.buscarArticulos();
   }
 
-  agregarArticulo(articulo: Articulo) {
-    this.solicitudService.agregarDetalleSolicitud(articulo);
+  agregarArticulo(articulo: Articulo): void {
+    if(this.solicitudService.solicitudOC.encabezado.estatus === 'ENVIADA' || this.solicitudService.solicitudOC.encabezado.estatus === 'POR AUTORIZAR') {
+      const tipoMovimiento = (this.usuario.esAdmin) ? 'orden de compra' : 'solicitud de orden de compra';
+      this.modalService.confirm({
+        nzTitle: `¿Desea crear una nueva ${tipoMovimiento}?`,
+        nzOkText: 'Aceptar',
+        nzCancelText: 'Cancelar',
+        nzOnOk: () => {
+          this.solicitudService.valoresPorDefectoOrdenSolicitud();
+          this.solicitudService.agregarDetalleSolicitud(articulo);
+        },
+        nzOnCancel: () => {
+          console.log('CANCELO');
+        }
+      });
+    } else {
+      this.solicitudService.agregarDetalleSolicitud(articulo);
+    }
   }
 }

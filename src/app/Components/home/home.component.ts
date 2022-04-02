@@ -89,7 +89,12 @@ export class HomeComponent implements OnInit {
   }
 
   verSolicitudesAgentes(): void {
-    this.router.navigate(['./solicitudes'], {relativeTo: this.route});
+    this.router.navigate(['./solicitudes_agentes'], {relativeTo: this.route});
   }
+
+  verMisOrdenesSolicitudes(): void {
+    this.router.navigate(['./ordenes_solicitudes'], {relativeTo: this.route});
+  }
+
 
 }

@@ -1,0 +1,41 @@
+<div  class="TotalSolicitudOrden" fxHide.xs fxHide.sm fxShow.md fxShow.lg fxShow.xl fxLayout="row" fxFill>
+    <div fxFlex="16.6666" class="concepto">
+        <span>Importe:</span>
+    </div>
+    <div fxFlex="16.6666" class="monto">
+        <span>{{Importe | currency}}</span>
+    </div>
+    <div fxFlex="16.6666" class="concepto">
+        <span>Impuestos:</span>
+    </div>
+    <div fxFlex="16.6666" class="monto">
+        <span>{{Impuestos | currency}}</span>
+    </div>
+    <div fxFlex="16.6666" class="concepto">
+        <span>Total:</span>
+    </div>
+    <div fxFlex="16.6666" class="monto">
+        <span>{{ (Importe + Impuestos) | currency}}</span>
+    </div>
+</div>
+
+<div class="TotalSolicitudOrden" fxLayout="row wrap" fxFill fxShow.xs fxShow.sm fxHide.md fxHide.lg fxHide.xl>
+    <div fxFlex="50" class="concepto">
+        <span>Importe:</span>
+    </div>
+    <div fxFlex="50" class="monto">
+        <span>{{Importe | currency}}</span>
+    </div>
+    <div fxFlex="50" class="concepto">
+        <span>Impuestos:</span>
+    </div>
+    <div fxFlex="50" class="monto">
+        <span>{{Impuestos | currency}}</span>
+    </div>
+    <div fxFlex="50" class="concepto">
+        <span>Total:</span>
+    </div>
+    <div fxFlex="50" class="monto">
+        <span>{{ (Importe + Impuestos) | currency}}</span>
+    </div>
+</div>

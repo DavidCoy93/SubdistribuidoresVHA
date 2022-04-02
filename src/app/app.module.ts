@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { AppRoutingModule } from './app-routing.module';
@@ -32,7 +32,7 @@ import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { NZ_I18N } from 'ng-zorro-antd/i18n';
 import { en_US } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
-import en from '@angular/common/locales/en';
+import es from '@angular/common/locales/es-US';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ngxLoadingAnimationTypes, NgxLoadingModule } from 'ngx-loading';
 import { InterceptorService } from './Services/interceptor.service';
@@ -53,8 +53,11 @@ import { SolicitudesAgenteComponent } from './Components/solicitudes-agente/soli
 import { ModalDisponiblesAlmacenComponent } from './Components/modal-disponibles-almacen/modal-disponibles-almacen.component';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { NzImageModule } from 'ng-zorro-antd/image';
+import { TotalSolicitudOrdenComponent } from './Components/total-solicitud-orden/total-solicitud-orden.component';
+import { MisOrdenesSolicitudesComponent } from './Components/mis-ordenes-solicitudes/mis-ordenes-solicitudes.component';
 
-registerLocaleData(en);
+registerLocaleData(es, 'es');
 
 @NgModule({
   declarations: [
@@ -66,7 +69,9 @@ registerLocaleData(en);
     DialogView,
     DetalleArticuloComponent,
     SolicitudesAgenteComponent,
-    ModalDisponiblesAlmacenComponent
+    ModalDisponiblesAlmacenComponent,
+    TotalSolicitudOrdenComponent,
+    MisOrdenesSolicitudesComponent
   ],
   imports: [
     BrowserModule,
@@ -108,14 +113,16 @@ registerLocaleData(en);
     NzTagModule,
     NzSelectModule,
     NzModalModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    NzImageModule
   ],
   providers: [
     Title,
     { provide: MatPaginatorIntl, useClass: MatPaginatorIntlSpanish },
     { provide: NZ_I18N, useValue: en_US },
     { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
-    { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'warn' }}
+    { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'warn' }},
+    { provide: LOCALE_ID, useValue: 'es'}
   ],
   bootstrap: [AppComponent]
 })

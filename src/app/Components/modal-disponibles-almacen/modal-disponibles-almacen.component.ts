@@ -49,34 +49,34 @@ export class ModalDisponiblesAlmacenComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
-    // this.http.get<Articulo>(this.globalService.urlAPI + `Articulos/ArticuloCliente?Articulo=${this.articulo}&Cliente=${this.usuarioLogueado.cliente?.cliente}`, 
-    //   { 
-    //     headers: new HttpHeaders({
-    //       Authorization: 'Bearer ' + this.usuarioLogueado.token
-    //     })
-    //   }
-    // ).subscribe({
-    //   next: data => {
-    //     this.disponiblesAlmacen = data.rSaldoU;
-    //     if(this.disponiblesAlmacen.length === 0) {
-    //       this.dialog.open(DialogView, {
-    //         width: '300px',
-    //         data: {titulo: 'Error', mensaje: 'Por el momento no hay disponibilidad de este articulo'}
-    //       }).afterClosed().subscribe(() => {
-    //         this.modal.close();
-    //       })
-    //     }
-    //   },
-    //   error: err => {
-    //     this.dialog.open(DialogView, {
-    //       width: '300px',
-    //       data: {titulo: 'Error', mensaje: 'Ocurrio un error al obtener la disponibilidad de los almacenes'}
-    //     }).afterClosed().subscribe(() => {
-    //       this.modal.close();
-    //     })
-    //   }
-    // })
+    const ClienteParam = (this.usuarioLogueado.esAdmin) ? this.usuarioLogueado.cliente?.cliente : this.usuarioLogueado.agente?.rAgenteCte.cliente;
+    this.http.get<Articulo>(this.globalService.urlAPI + `Articulos/ArticuloCliente?Articulo=${this.articulo}&Cliente=${ClienteParam}`, 
+      { 
+        headers: new HttpHeaders({
+          Authorization: 'Bearer ' + this.usuarioLogueado.token
+        })
+      }
+    ).subscribe({
+      next: data => {
+        this.disponiblesAlmacen = data.rSaldoU;
+        if(this.disponiblesAlmacen.length === 0) {
+          this.dialog.open(DialogView, {
+            width: '300px',
+            data: {titulo: 'Error', mensaje: 'Por el momento no hay disponibilidad de este articulo'}
+          }).afterClosed().subscribe(() => {
+            this.modal.close();
+          })
+        }
+      },
+      error: err => {
+        this.dialog.open(DialogView, {
+          width: '300px',
+          data: {titulo: 'Error', mensaje: 'Ocurrio un error al obtener la disponibilidad de los almacenes'}
+        }).afterClosed().subscribe(() => {
+          this.modal.close();
+        })
+      }
+    })
   }
 
   cerrarModal(indice: number): void {
@@ -86,19 +86,21 @@ export class ModalDisponiblesAlmacenComponent implements OnInit {
         data: {titulo: 'Alerta'  ,mensaje: 'Por favor seleccione un almacén'}
       })
     } else {
+      const detalleAnterior = this.solicitudSevice.solicitudOC.detalle[indice];
       this.solicitudSevice.solicitudOC.detalle[indice].disponible = this.almacenSeleccionado.saldoUU;
       this.solicitudSevice.solicitudOC.detalle[indice].almacen = this.almacenSeleccionado.grupo;
+      this.solicitudSevice.ActualizarAlmacenDetalle(indice, detalleAnterior);
       this.modal.close();
     }
   }
 
-  seleccionar(indice: number): void {
+  seleccionar(indice: number, almacen: SaldoU): void {
     for (let i = 0; i < this.tbody.nativeElement.rows.length; i++) {
       this.tbody.nativeElement.rows[i].classList.remove('seleccionado');
     }
     this.tbody.nativeElement.rows[indice].classList.add('seleccionado');
-    this.almacenSeleccionado.grupo = 'CDG-100';
-    this.almacenSeleccionado.saldoUU = 2;
+    this.almacenSeleccionado.grupo = almacen.grupo;
+    this.almacenSeleccionado.saldoUU = almacen.saldoUU;
   }
 
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanDeactivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Usuario } from '../Models/Usuario';
 import { GlobalsService } from '../Services/globals.service';
@@ -27,7 +27,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   }
 
   canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree | Observable<boolean | UrlTree> | Promise<boolean | UrlTree> {
-    if(!this.usuarioLogueado.esAdmin && childRoute.url[0].path === 'solicitudes') {
+    if(!this.usuarioLogueado.esAdmin && childRoute.url[0].path === 'solicitudes_agentes') {
       return this.router.navigate(['/home']).then(() => false);
     } else {
       return true;

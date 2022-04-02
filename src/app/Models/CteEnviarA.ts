@@ -1,0 +1,21 @@
+export interface CteEnviarA {
+    cliente?: string|null,
+    id?: number|null,
+    nombre?: string|null,
+    direccion?: string|null,
+    direccionNumero?: string|null,
+    direccionNumeroInt?: string|null,
+    entreCalles?: string|null,
+    plano?: string|null,
+    observaciones?: string|null,
+    colonia?:string|null,
+    delegacion?:string|null,
+    poblacion?:string|null,
+    estado?: string|null,
+    pais?: string|null,
+    zona?: string|null,
+    ruta?: string|null,
+    codigoPostal?: string|null,
+    telefonos?: string|null,
+    estatus?: string|null
+}

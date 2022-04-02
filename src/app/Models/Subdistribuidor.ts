@@ -1,3 +1,5 @@
+import { SubdistribuidorD } from "./SubdistribuidorD"
+
 export interface Subdistribuidor {
     id?: number|null,
     documento?: string|null,//Required
@@ -11,6 +13,7 @@ export interface Subdistribuidor {
     estatus?: string|null,//R
     almacen?: string|null,
     cliente?: string|null,//R
+    agente?: string|null,
     formaPago?: string|null,
     condicion?: string|null,//R
     vencimiento?: Date|null,//R
@@ -25,5 +28,6 @@ export interface Subdistribuidor {
     empresa?: string|null, //VHA
     sucursal?: number|null,//NULO
     usuarioAlta?: string|null,//NULO
-    fechaAlta?: Date|null//NULO
+    fechaAlta?: Date|null,//NULO
+    rSubdistribuidorD: Array<SubdistribuidorD>
 }

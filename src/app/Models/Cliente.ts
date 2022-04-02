@@ -1,3 +1,7 @@
+import { Condicion } from "./Condicion";
+import { CteEnviarA } from "./CteEnviarA";
+import { Descuento } from "./Descuento";
+
 export interface Cliente {
     cliente?: string,
     rama?: string,
@@ -31,9 +35,9 @@ export interface Cliente {
     defMoneda?: string|null,
     agente?: string|null,
     estatus?: string,
-    rCondicion?: any|null,
-    rDescuento?: any|null,
-    rCteEnviarA?: any|null,
+    rCondicion?: Condicion|null,
+    rDescuento?: Descuento|null,
+    rCteEnviarA?: Array<CteEnviarA>|null,
     contrasena?: string|null,
     contrasena2?: string,
     eje?: string|null,

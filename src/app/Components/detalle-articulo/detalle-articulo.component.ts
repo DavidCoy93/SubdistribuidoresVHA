@@ -9,6 +9,7 @@ import { DialogView } from '../notificacion/dialogView';
 import { Title } from '@angular/platform-browser';
 import { SolicitudService } from 'src/app/Services/solicitud.service';
 import { SaldoU } from 'src/app/Models/SaldoU';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 
 @Component({
@@ -20,10 +21,9 @@ export class DetalleArticuloComponent implements OnInit {
 
   idArticulo: string|null;
   usuario: Usuario = {};
-  articulo: Articulo = {articulo: '', descripcion1: '', precioLista: 0, Cantidad: 1, rSaldoU: []};
-  urlImagen: string = '\\\\192.168.1.230\\Img-Intelisis$\\IMAGENES_MODULO_DE_VENTAS\\';
-  imagenesArticulo: string[] = [];
+  articulo: Articulo = {articulo: '', descripcion1: '', precioLista: 0, Cantidad: 1, rSaldoU: [], imagenBase64: []};
   almacenSeleccionado?: SaldoU = undefined;
+  imagenNoDisponible = 'assets/img/Imagen no disponible_B.jpg'
 
   @ViewChild('tbodyDetalle') detalleBody!: ElementRef;
 
@@ -34,15 +34,17 @@ export class DetalleArticuloComponent implements OnInit {
     private http: HttpClient,
     private dialog: MatDialog,
     private titleService: Title,
-    private solicitudService: SolicitudService) 
+    private solicitudService: SolicitudService,
+    private modalService: NzModalService) 
   { 
     this.idArticulo = this.route.snapshot.paramMap.get('id');
-    //@ts-ignore
-    this.titleService.setTitle(this.idArticulo);
+    const tituloTab = (typeof this.idArticulo === 'string') ? this.idArticulo : '';
+    this.titleService.setTitle(tituloTab);
 
     this.usuario = globalService.UsuarioLogueado;
+    let parametroCliente = (this.usuario.esAdmin) ? this.usuario.cliente?.cliente : this.usuario.agente?.rAgenteCte.cliente; 
 
-    this.http.get<Articulo>(this.globalService.urlAPI + `Articulos/ArticuloCliente?Articulo=${this.idArticulo}&Cliente=${this.usuario.cliente?.cliente}`, 
+    this.http.get<Articulo>(this.globalService.urlAPI + `Articulos/ArticuloCliente?Articulo=${this.idArticulo}&Cliente=${parametroCliente}`, 
       { 
         headers: new HttpHeaders({
           Authorization: 'Bearer ' + this.usuario.token
@@ -50,7 +52,6 @@ export class DetalleArticuloComponent implements OnInit {
       }
     ).subscribe({
       next: data => {
-
         if(data === null || data === undefined) {
           this.dialog.open(DialogView, {
             width: '250px',
@@ -59,10 +60,6 @@ export class DetalleArticuloComponent implements OnInit {
           router.navigate(['..']);
         } else {
           this.articulo = data;
-          this.urlImagen += this.articulo.articulo;
-          // const Imagen1 = this.globalService.urlImages + this.articulo.articulo + '_01.jpg'
-          // const Imagen2 = this.globalService.urlImages + this.articulo.articulo + '_02.jpg'
-          // this.imagenesArticulo.push(Imagen1, Imagen2);
         }
       },
       error: err =>{
@@ -87,7 +84,25 @@ export class DetalleArticuloComponent implements OnInit {
         data: {titulo: 'Alerta', mensaje: 'Por favor seleccione un almacén de la tabla'}
       })
     } else {
-      this.solicitudService.agregarDetalleSolicitud(this.articulo, this.almacenSeleccionado);
+      if (this.solicitudService.solicitudOC.encabezado.estatus === 'ENVIADA' || this.solicitudService.solicitudOC.encabezado.estatus === 'POR AUTORIZAR') {
+        const tipoMovimiento = (this.usuario.esAdmin) ? 'orden de compra' : 'solicitud de orden de compra';
+        this.modalService.confirm({
+          nzTitle: `¿Desea crear una nueva ${tipoMovimiento}?`,
+          nzOkText: 'Aceptar',
+          nzCancelText: 'Cancelar',
+          nzOnOk: () => {
+            this.solicitudService.valoresPorDefectoOrdenSolicitud();
+            this.solicitudService.agregarDetalleSolicitud(this.articulo, this.almacenSeleccionado);
+          },
+          nzOnCancel: () => {
+            console.log('CANCELO');
+          }
+        });
+      } else {
+        this.solicitudService.agregarDetalleSolicitud(this.articulo, this.almacenSeleccionado);
+      }
+
+      
     }
     
   }

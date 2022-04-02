@@ -1,7 +1,7 @@
 <nz-page-header nzTitle="Solicitudes de orden de compra por autorizar" nzBackIcon>
 </nz-page-header>
 <div fxLayout="row">
-    <div fxFlexOffset="10" fxFlex="20">
+    <div fxFlexOffset="10" fxFlex.xs="30" fxFlex.sm="30" fxFlex.md="20" fxFlex.lg="20" fxFlex.xl="20">
         <mat-form-field appearance="standard">
             <mat-label>Agente</mat-label>
             <mat-select [(ngModel)]="agente" name="almacenOC">
@@ -14,16 +14,18 @@
 <div fxLayout="row">
     <div fxFlexOffset="10" fxFlex="80">
         <mat-accordion multi>
-            <mat-expansion-panel>
+            <mat-expansion-panel *ngFor="let solicitud of solicitudesAgente">
                 <mat-expansion-panel-header>
-                    <mat-panel-title>Solicitud 1</mat-panel-title>
+                    <mat-panel-title>{{ 'Folio: ' + solicitud.folio }}</mat-panel-title>
                     <mat-panel-description>
                         <div fxLayout="row" fxFill>
-                            <div fxFlex="95">
-                                descripcion 1
+                            <div fxFlex.xs="50" fxFlex.sm="50" fxFlex.md="85" fxFlex.lg="85" fxFlex.xl="85">
+                               Fecha Alta: {{ solicitud.fechaAlta | date: 'dd/MMMM/YYYY' }}
                             </div>
-                            <div fxFlex="5">
-                                <mat-checkbox color="warn"></mat-checkbox>
+                            <div fxFlex.xs="20" fxFlex.sm="20" fxFlex.md="10" fxFlex.lg="10" fxFlex.xl="10">
+                                <button mat-raised-button>
+                                    Autorizar
+                                </button>
                             </div>
                         </div>
                     </mat-panel-description>
@@ -40,7 +42,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let detalle of detalleSolicitud">
+                            <tr *ngFor="let detalle of solicitud.rSubdistribuidorD">
                                 <td>{{ detalle.articulo }}</td>
                                 <td>{{ detalle.descripcion }}</td>
                                 <td>{{ detalle.cantidad }}</td>
@@ -49,45 +51,7 @@
                         </tbody>
                     </table>
                 </div>
-
-            </mat-expansion-panel>
-
-            <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                    <mat-panel-title>Solicitud 1</mat-panel-title>
-                    <mat-panel-description>
-                        <div fxLayout="row" fxFill>
-                            <div fxFlex="95">
-                                descripcion 1
-                            </div>
-                            <div fxFlex="5">
-                                <mat-checkbox color="warn"></mat-checkbox>
-                            </div>
-                        </div>
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Articulo</th>
-                                <th>Descripción</th>
-                                <th>Cantidad</th>
-                                <th>Precio</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let detalle of detalleSolicitud">
-                                <td>{{ detalle.articulo }}</td>
-                                <td>{{ detalle.descripcion }}</td>
-                                <td>{{ detalle.cantidad }}</td>
-                                <td>{{ detalle.precio| currency }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
+                <app-total-solicitud-orden [Importe]="solicitud.importe" [Impuestos]="solicitud.impuestos"></app-total-solicitud-orden>
             </mat-expansion-panel>
         </mat-accordion>
     </div>

@@ -1,6 +1,6 @@
 <div fxLayout="row" fxFill>
     <div fxFlexOffset="10" fxFlex="80">
-        <table class="table table-striped">
+        <table class="table table-striped" *ngIf="disponiblesAlmacen.length > 0">
             <thead>
                 <tr>
                     <th>Almacen</th>
@@ -8,11 +8,24 @@
                 </tr>
             </thead>
             <tbody #tbodyArticulos>
-                <!-- <tr *ngFor="let disponible of disponiblesAlmacen">
-                    <td>{{disponible.grupo}}</td>
+                <tr *ngFor="let disponible of disponiblesAlmacen; let indice = index" (click)="seleccionar(indice, disponible)">
+                    <td [ngSwitch]="disponible.grupo">
+                        <ng-container *ngSwitchCase="'AYU-100'">AYUNTAMIENTO, AGS</ng-container>
+                        <ng-container *ngSwitchCase="'BLV-100'">BLV A ZAC, AGS</ng-container>
+                        <ng-container *ngSwitchCase="'CDG-100'">CEDIS, AGS</ng-container>
+                        <ng-container *ngSwitchCase="'LOP-100'">LOPEZ MATEOS, AGS</ng-container>
+                        <ng-container *ngSwitchCase="'UNI-100'">UNIVERSIDAD, AGS</ng-container>
+                        <ng-container *ngSwitchCase="'HAC-100'">HACIENDAS, AGS</ng-container>
+                        <ng-container *ngSwitchCase="'PAS-100'">PASEO DE LA CRUZ, AGS</ng-container>
+                        <ng-container *ngSwitchCase="'RIN-100'">RINCÓN DE ROMOS, AGS</ng-container>
+                        <ng-container *ngSwitchCase="'NHE-100'">NIÑOS HEROES, JAL</ng-container>
+                        <ng-container *ngSwitchCase="'JUP-100'">JUAN PABLO, JAL</ng-container>
+                        <ng-container *ngSwitchCase="'GZL-100'">GONZALEZ GALLO, JAL</ng-container>
+                        <ng-container *ngSwitchCase="'ZAC-100'">GUADALUPE, ZAC</ng-container>
+                    </td>
                     <td>{{disponible.saldoUU}}</td>
-                </tr> -->
-                <tr (click)="seleccionar(0)">
+                </tr>
+                <!-- <tr (click)="seleccionar(0)">
                     <td>CDG-100</td>
                     <td>2</td>
                 </tr>
@@ -23,7 +36,7 @@
                 <tr (click)="seleccionar(2)">
                     <td>ZAC-100</td>
                     <td>2</td>
-                </tr>
+                </tr> -->
             </tbody>
         </table>
     </div>

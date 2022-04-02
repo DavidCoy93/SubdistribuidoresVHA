@@ -22,7 +22,6 @@ mat-icon {
     color: #fff;
     height: 46px;
     padding: 10px;
-    margin-top: 15px;
 }
 
 .totalEncabezado span {
@@ -62,4 +61,16 @@ mat-icon {
 button.mat-raised-button {
     background-color: #ff0000 !important;
     color: #fff;
+}
+
+.almacen {
+    cursor: pointer;
+}
+
+.almacen:hover {
+    color: #ff0000;
+}
+
+.mat-form-field {
+    width: 100%;
 }

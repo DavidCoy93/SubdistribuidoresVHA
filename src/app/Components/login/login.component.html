@@ -12,12 +12,14 @@
                             <mat-form-field appearance="fill" class="linearlayout">
                                 <mat-label>No. Cliente</mat-label>
                                 <input matInput formControlName="usuario" required>
+                                <mat-icon matSuffix>person</mat-icon>
                                 <mat-error *ngIf="usuario?.errors?.['required']">Ingrese su número de cliente</mat-error>
                             </mat-form-field>
                     
                             <mat-form-field appearance="fill" class="linearlayout">
                                 <mat-label>Contraseña</mat-label>
                                 <input matInput type="password" formControlName="contrasena" required>
+                                <mat-icon matSuffix>lock</mat-icon>
                                 <mat-error *ngIf="contrasena?.errors?.['required']">Ingrese la contraseña</mat-error>
                             </mat-form-field>
                             <div fxLayout="row">

@@ -5,6 +5,7 @@ import { CarritoComponent } from './Components/carrito/carrito.component';
 import { DetalleArticuloComponent } from './Components/detalle-articulo/detalle-articulo.component';
 import { HomeComponent } from './Components/home/home.component';
 import { LoginComponent } from './Components/login/login.component';
+import { MisOrdenesSolicitudesComponent } from './Components/mis-ordenes-solicitudes/mis-ordenes-solicitudes.component';
 import { SolicitudesAgenteComponent } from './Components/solicitudes-agente/solicitudes-agente.component';
 import { AuthGuard } from './Guards/auth.guard';
 
@@ -16,10 +17,13 @@ const routes: Routes = [
       {path: 'articulos', component: ArticulosComponent},
       {path: 'articulo/:id', component: DetalleArticuloComponent},
       {path: 'carrito', component: CarritoComponent},
-      {path: 'solicitudes', component: SolicitudesAgenteComponent}
+      {path: 'solicitudes_agentes', component: SolicitudesAgenteComponent},
+      {path: 'ordenes_solicitudes', component: MisOrdenesSolicitudesComponent},
+      {path: 'carrito/:idSolicitud', component: CarritoComponent}
     ]
   },
-  {path: '', redirectTo: '/login', pathMatch: 'full'}
+  {path: '', redirectTo: '/login', pathMatch: 'full'},
+  {path: '**', redirectTo: '/login', pathMatch: 'full'}
   
 ];
 

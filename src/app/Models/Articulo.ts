@@ -31,7 +31,8 @@ export interface Articulo {
     rOferta?: Oferta,
     precioPromocion?: number,
     labelCount?: number,
-    rArticuloImagen?: ArticuloImagen
+    rArticuloImagen?: ArticuloImagen,
+    imagenBase64: Array<string>,
     Cantidad: number,
 
 }
