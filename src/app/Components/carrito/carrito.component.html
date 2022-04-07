@@ -1,22 +1,21 @@
-<nz-page-header *ngIf="solicitudService.solicitudOC.encabezado.id !== undefined" [nzTitle]="titulo" nzBackIcon>
+<nz-page-header *ngIf="solicitudService.solicitudOC.encabezado.id !== undefined" [nzTitle]="titulo" nzBackIcon nz-tooltip [nzTooltipTitle]="titulo" [nzTooltipMouseEnterDelay]="3" [nzTooltipMouseLeaveDelay]="1" [nzTooltipTrigger]="'hover'">
     <nz-page-header-tags [ngSwitch]="solicitudService.solicitudOC.encabezado.estatus">
         <nz-tag *ngSwitchCase="'PENDIENTE'" nzColor="processing">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
         <nz-tag *ngSwitchCase="'ENVIADA'" nzColor="success">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
         <nz-tag *ngSwitchCase="'POR AUTORIZAR'" nzColor="warning">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
+        <nz-tag *ngSwitchCase="'CONCLUIDO'" nzColor="success">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
+        <nz-tag *ngSwitchCase="'REVISION'" nzColor="warning">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
     </nz-page-header-tags>
     <nz-page-header-extra>
-        <button mat-raised-button *ngIf="solicitudService.solicitudOC.detalle.length > 0 && solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'" (click)="enviarOrden()">
-            <span >{{ (usuario.esAdmin) ? 'Estoy de acuerdo' : 'Enviar a autorización' }}</span>
-        </button>
-        <button mat-raised-button *ngIf="solicitudService.solicitudOC.detalle.length > 0 && solicitudService.solicitudOC.encabezado.estatus !== 'PENDIENTE'" (click)="crearNuevaSolicitudOrden()">
-            <span >{{ (usuario.esAdmin) ? 'Nueva orden' : 'Nueva solicitud' }}</span>
+        <button mat-raised-button *ngIf="solicitudService.solicitudOC.detalle.length > 0 && solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'" (click)="enviarOrden((usuario.esAdmin) ? 'ENVIADA' : 'POR AUTORIZAR')">
+            <span >{{ (usuario.esAdmin) ? 'Enviar solicitud' : 'Enviar a autorización' }}</span>
         </button>
     </nz-page-header-extra>
 </nz-page-header>
 
 <div fxLayout="row">
     <div fxFlexOffset="10" fxFlex="80">
-        <nz-result nzStatus="warning" [nzTitle]="(usuario.esAdmin) ? 'Aun no se han agregado articulos a la orden' : 'Aun no se han agregado articulos a la solicitud'" *ngIf="solicitudService.solicitudOC.detalle.length === 0; else ContenidoCarrito">
+        <nz-result nzStatus="warning" [nzTitle]="'Aun no se han agregado articulos a la solicitud'" *ngIf="solicitudService.solicitudOC.detalle.length === 0; else ContenidoCarrito">
             <div nz-result-extra>
                 <button nz-button nzType="primary" routerLink="..">Regresar</button>
             </div>
@@ -29,10 +28,11 @@
                             <th>Articulo</th>
                             <th>Descripción</th>
                             <th class="centrarTexto">Unidad</th>
-                            <th class="centrarTexto">Disponible</th>
+                            <th class="centrarTexto" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'">Disponible</th>
                             <th class="centrarTexto">Cantidad</th>
                             <th class="centrarTexto" *ngIf="usuario.esAdmin">Precio</th>
                             <th class="centrarTexto">Almacén</th>
+                            <th class="centrarTexto">Linea</th>
                             <th class="centrarTexto" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'">Opciones</th>
                         </tr>
                     </thead>
@@ -41,13 +41,13 @@
                             <td>{{articulo.articulo}}</td>
                             <td>{{articulo.descripcion}}</td>
                             <td class="centrarTexto">{{articulo.unidad}}</td>
-                            <td class="centrarTexto">{{articulo.disponible}}</td>
+                            <td *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'" class="centrarTexto">{{articulo.disponible}}</td>
                             <td class="centrarTexto">
                                 <!-- <input style="width: 50px;" type="number" [max]="(articulo.disponible === undefined) ? 0 : articulo.disponible" min="0" [(ngModel)]="articulo.cantidad" (change)="solicitudService.calcularImporte()"> -->
-                                <input style="width: 50px;" [disabled]="solicitudService.solicitudOC.encabezado.estatus === 'ENVIADA'|| solicitudService.solicitudOC.encabezado.estatus === 'POR AUTORIZAR'" type="number" [(ngModel)]="articulo.cantidad" (change)="solicitudService.modificarCantidadArticulo(articulo)">
+                                <input style="width: 50px;" [disabled]="solicitudService.solicitudOC.encabezado.estatus !== 'PENDIENTE'" type="number" [(ngModel)]="articulo.cantidad" (change)="solicitudService.modificarCantidadArticulo(articulo)">
                             </td>
                             <td *ngIf="usuario.esAdmin" class="centrarTexto">{{articulo.precio | currency}}</td>
-                            <td class="centrarTexto almacen" *ngIf="articulo.almacen !== undefined; else agregarAlmacen" [ngSwitch]="articulo.almacen" (click)="verDisponibles(articulo, indice)">
+                            <td class="centrarTexto almacen" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE' && articulo.linea === 'STOCK' ; else almacenDesactivado" [ngSwitch]="articulo.almacen" (click)="verDisponibles(articulo, indice)">
                                 <ng-container *ngSwitchCase="'AYU-100'">AYUNTAMIENTO, AGS</ng-container>
                                 <ng-container *ngSwitchCase="'BLV-100'">BLV A ZAC, AGS</ng-container>
                                 <ng-container *ngSwitchCase="'CDG-100'">CEDIS, AGS</ng-container>
@@ -61,11 +61,23 @@
                                 <ng-container *ngSwitchCase="'GZL-100'">GONZALEZ GALLO, JAL</ng-container>
                                 <ng-container *ngSwitchCase="'ZAC-100'">GUADALUPE, ZAC</ng-container>
                             </td>
-                            <ng-template #agregarAlmacen>
-                                <td class="centrarTexto">
-                                    <mat-icon matTooltip="Seleccionar Almacen" (click)="verDisponibles(articulo, indice)">add_circle_outline</mat-icon>
+                            <ng-template #almacenDesactivado>
+                                <td class="centrarTexto" [ngSwitch]="articulo.almacen">
+                                    <ng-container *ngSwitchCase="'AYU-100'">AYUNTAMIENTO, AGS</ng-container>
+                                    <ng-container *ngSwitchCase="'BLV-100'">BLV A ZAC, AGS</ng-container>
+                                    <ng-container *ngSwitchCase="'CDG-100'">CEDIS, AGS</ng-container>
+                                    <ng-container *ngSwitchCase="'LOP-100'">LOPEZ MATEOS, AGS</ng-container>
+                                    <ng-container *ngSwitchCase="'UNI-100'">UNIVERSIDAD, AGS</ng-container>
+                                    <ng-container *ngSwitchCase="'HAC-100'">HACIENDAS, AGS</ng-container>
+                                    <ng-container *ngSwitchCase="'PAS-100'">PASEO DE LA CRUZ, AGS</ng-container>
+                                    <ng-container *ngSwitchCase="'RIN-100'">RINCÓN DE ROMOS, AGS</ng-container>
+                                    <ng-container *ngSwitchCase="'NHE-100'">NIÑOS HEROES, JAL</ng-container>
+                                    <ng-container *ngSwitchCase="'JUP-100'">JUAN PABLO, JAL</ng-container>
+                                    <ng-container *ngSwitchCase="'GZL-100'">GONZALEZ GALLO, JAL</ng-container>
+                                    <ng-container *ngSwitchCase="'ZAC-100'">GUADALUPE, ZAC</ng-container>
                                 </td>
                             </ng-template>
+                            <td class="centrarTexto">{{articulo.linea}}</td>
                             <td class="centrarTexto" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'">
                                 <mat-icon matTooltip="Quitar" (click)="solicitudService.quitarDetalleSolicitud(articulo)">delete</mat-icon>
                             </td>
@@ -82,9 +94,8 @@
         <div fxFlexOffset.md="10" fxFlex.md="40" fxFlexOffset.lg="10" fxFlex.lg="40" fxFlexOffset.xl="10" fxFlex.xl="40">
             <mat-form-field appearance="standard">
                 <mat-label>Observaciones</mat-label>
-                
-                <input type="text" matInput [(ngModel)]="solicitudService.solicitudOC.encabezado.observaciones">
-                <mat-icon (click)="solicitudService.actualizarEncabezadoOrdenSolicitud()" matSuffix matTooltip="Guardar" style="color: green;">done</mat-icon>
+                <input type="text" matInput [(ngModel)]="solicitudService.solicitudOC.encabezado.observaciones" [readonly]="solicitudService.solicitudOC.encabezado.estatus !=='PENDIENTE'">
+                <mat-icon *ngIf="solicitudService.solicitudOC.encabezado.estatus ==='PENDIENTE'" (click)="solicitudService.actualizarEncabezadoOrdenSolicitud()" matSuffix matTooltip="Guardar" style="color: green;">done</mat-icon>
             </mat-form-field>
         </div>
         <div fxFlex.md="40" fxFlex.lg="40" fxFlex.xl="40" *ngIf="usuario.esAdmin">
@@ -174,8 +185,8 @@
                 <div fxFlexOffset="10" fxFlex="80">
                     <mat-form-field appearance="standard">
                         <mat-label>Observaciones</mat-label>
-                        <input type="text" matInput [(ngModel)]="solicitudService.solicitudOC.encabezado.observaciones">
-                        <mat-icon (click)="solicitudService.actualizarEncabezadoOrdenSolicitud()" matSuffix matTooltip="Guardar">done</mat-icon>
+                        <input type="text" matInput [(ngModel)]="solicitudService.solicitudOC.encabezado.observaciones" [readonly]="solicitudService.solicitudOC.encabezado.estatus !=='PENDIENTE'">
+                        <mat-icon *ngIf="solicitudService.solicitudOC.encabezado.estatus ==='PENDIENTE'" (click)="solicitudService.actualizarEncabezadoOrdenSolicitud()" matSuffix matTooltip="Guardar" style="color: green;">done</mat-icon>
                     </mat-form-field>
                 </div>
             </div>

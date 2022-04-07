@@ -12,6 +12,7 @@ export class GlobalsService {
   public urlImages: string = 'assets/img/IMAGENES_MODULO_DE_VENTAS/';
   public UsuarioLogueado: Usuario = {};
   public familiaArticulo: string = 'TODAS';
+  public lineaArticulo: string = 'TODAS';
   
   constructor() { 
     const usuarioLocal: any =  localStorage.getItem('usuario');

@@ -1,0 +1,19 @@
+<div fxLayout="column" fxFill>
+    <div fxFlex="10">
+    </div>
+    <div fxFlex="80">
+        <div fxLayout="row" fxFill>
+            <div fxFlexOffset="10" fxFlex="50">
+                <mat-form-field style="width: 100%;">
+                    <mat-label>Cliente</mat-label>
+                    <input type="text" matInput [formControl]="clienteControl" [matAutocomplete]="autoCte">
+                    <mat-autocomplete #autoCte="matAutocomplete">
+                        <mat-option *ngFor="let cliente of listaClientes | async" [value]="cliente">
+                            {{cliente}}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</div>

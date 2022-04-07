@@ -56,6 +56,12 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { NzImageModule } from 'ng-zorro-antd/image';
 import { TotalSolicitudOrdenComponent } from './Components/total-solicitud-orden/total-solicitud-orden.component';
 import { MisOrdenesSolicitudesComponent } from './Components/mis-ordenes-solicitudes/mis-ordenes-solicitudes.component';
+import { NzListModule } from 'ng-zorro-antd/list';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { DescuentosSolicitudesComponent } from './Components/descuentos-solicitudes/descuentos-solicitudes.component';
+import { MatAutocompleteModule  } from '@angular/material/autocomplete';
 
 registerLocaleData(es, 'es');
 
@@ -71,7 +77,8 @@ registerLocaleData(es, 'es');
     SolicitudesAgenteComponent,
     ModalDisponiblesAlmacenComponent,
     TotalSolicitudOrdenComponent,
-    MisOrdenesSolicitudesComponent
+    MisOrdenesSolicitudesComponent,
+    DescuentosSolicitudesComponent
   ],
   imports: [
     BrowserModule,
@@ -114,7 +121,12 @@ registerLocaleData(es, 'es');
     NzSelectModule,
     NzModalModule,
     MatCheckboxModule,
-    NzImageModule
+    NzImageModule,
+    NzListModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    NzToolTipModule,
+    MatAutocompleteModule
   ],
   providers: [
     Title,

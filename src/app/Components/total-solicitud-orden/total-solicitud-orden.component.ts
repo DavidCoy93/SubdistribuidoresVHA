@@ -9,6 +9,7 @@ export class TotalSolicitudOrdenComponent implements OnInit {
 
   @Input() Importe: number = 0;
   @Input() Impuestos: number = 0;
+  @Input() Observaciones?: string|null = ''
 
   constructor() { }
 

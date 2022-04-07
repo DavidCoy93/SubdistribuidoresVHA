@@ -4,14 +4,14 @@
     <div fxFlexOffset="10" fxFlex.xs="30" fxFlex.sm="30" fxFlex.md="20" fxFlex.lg="20" fxFlex.xl="20">
         <mat-form-field appearance="standard">
             <mat-label>Agente</mat-label>
-            <mat-select [(ngModel)]="agente" name="almacenOC">
-                <mat-option value="1">Agente 1</mat-option>
-                <mat-option value="2">Agente 2</mat-option>
+            <mat-select [(ngModel)]="agente" name="agenteCte" (ngModelChange)="seleccionarAgente($event)">
+                <mat-option value="">TODOS</mat-option>
+                <mat-option *ngFor="let agente of agentes" [value]="agente.agenteID">{{agente.nombre}}</mat-option>
             </mat-select>
         </mat-form-field>
     </div>
 </div>
-<div fxLayout="row">
+<div fxLayout="row" *ngIf="solicitudesAgente.length > 0; else sinSolicitudes">
     <div fxFlexOffset="10" fxFlex="80">
         <mat-accordion multi>
             <mat-expansion-panel *ngFor="let solicitud of solicitudesAgente">
@@ -19,11 +19,16 @@
                     <mat-panel-title>{{ 'Folio: ' + solicitud.folio }}</mat-panel-title>
                     <mat-panel-description>
                         <div fxLayout="row" fxFill>
-                            <div fxFlex.xs="50" fxFlex.sm="50" fxFlex.md="85" fxFlex.lg="85" fxFlex.xl="85">
-                               Fecha Alta: {{ solicitud.fechaAlta | date: 'dd/MMMM/YYYY' }}
+                            <div fxFlex.xs="40" fxFlex.sm="40" fxFlex.md="60" fxFlex.lg="60" fxFlex.xl="60">
+                               Fecha Alta: {{ solicitud.fechaAlta | date: 'dd/MM/YYYY' }}
                             </div>
-                            <div fxFlex.xs="20" fxFlex.sm="20" fxFlex.md="10" fxFlex.lg="10" fxFlex.xl="10">
-                                <button mat-raised-button>
+                            <div fxFlex.xs="10" fxFlex.sm="10" fxFlex.md="15" fxFlex.lg="15" fxFlex.xl="15">
+                                <button mat-raised-button (click)="autorizarRechazarSolicitud(solicitud, 'RECHAZAR')">
+                                    Rechazar
+                                </button>
+                            </div>
+                            <div fxFlexOffset.xs="5" fxFlex.xs="20" fxFlexOffset.sm="5" fxFlex.sm="20" fxFlex.md="15" fxFlex.lg="15" fxFlex.xl="15">
+                                <button mat-raised-button (click)="autorizarRechazarSolicitud(solicitud, 'AUTORIZAR')">
                                     Autorizar
                                 </button>
                             </div>
@@ -51,8 +56,16 @@
                         </tbody>
                     </table>
                 </div>
-                <app-total-solicitud-orden [Importe]="solicitud.importe" [Impuestos]="solicitud.impuestos"></app-total-solicitud-orden>
+                <app-total-solicitud-orden [Importe]="solicitud.importe" [Impuestos]="solicitud.impuestos" [Observaciones]="solicitud.observaciones"></app-total-solicitud-orden>
             </mat-expansion-panel>
         </mat-accordion>
     </div>
 </div>
+<ng-template #sinSolicitudes>
+    <div fxLayout="row">
+        <div fxFlexOffset="10" fxFlex="80">
+            <nz-result nzStatus="info" nzTitle="No se han encontrado solicitudes">
+            </nz-result>
+        </div>
+    </div>
+</ng-template>

@@ -25,6 +25,8 @@ export class SolicitudService {
     encabezado: { estatus: 'PENDIENTE', importe: 0, moneda: 'Pesos', impuestos: 0, almacen: 'CDG-100', empresa: 'VHA', rSubdistribuidorD: []}, 
     detalle: []
   }
+  public lineaSolicitud: string = '';
+  public totalCarritoPendiente: number = 0;
 
   constructor(
     private globalService: GlobalsService,
@@ -35,7 +37,11 @@ export class SolicitudService {
     private router: Router) 
   { 
     this.usuarioSD = this.globalService.UsuarioLogueado;
+    this.verificarSolicitudesPendientes();
+  }
 
+
+  verificarSolicitudesPendientes(): void {
     const clienteParam = (this.usuarioSD.esAdmin) ? this.usuarioSD.cliente?.cliente : this.usuarioSD.agente?.rAgenteCte.cliente;
     const agenteParam = (this.usuarioSD.esAdmin) ? '' : this.usuarioSD.agente?.rAgenteCte.agente;
 
@@ -48,6 +54,16 @@ export class SolicitudService {
         if (data.length > 0) {
           this.solicitudOC.encabezado = data[0];
           this.solicitudOC.detalle = data[0].rSubdistribuidorD;
+          this.totalCarritoPendiente = this.solicitudOC.detalle.length;
+          if (this.solicitudOC.detalle.length > 0) {
+            if (typeof this.solicitudOC.detalle[0].linea === 'string') {
+              this.lineaSolicitud = this.solicitudOC.detalle[0].linea;
+            }
+
+            if (this.lineaSolicitud === 'STOCK') {
+              this.verificarExistenciasDetalleSolicitud();
+            }
+          }
         } else {
           this.valoresPorDefectoOrdenSolicitud();
         }
@@ -61,7 +77,7 @@ export class SolicitudService {
     })
   }
 
-  agregarDetalleSolicitud(art: Articulo, almacen?: SaldoU) {
+  agregarDetalleSolicitud(art: Articulo, almacen?: SaldoU): void {
 
     let detalleSolicitud: SubdistribuidorD = {
       articulo: art.articulo, 
@@ -72,7 +88,8 @@ export class SolicitudService {
       descuento: 0,
       porcentajeDescuento: 0,
       pendiente: 1,
-      renglon: 0
+      renglon: 0,
+      linea: art.linea
     };
 
     const detalleExistente = this.solicitudOC.detalle.find(det => det.articulo === detalleSolicitud.articulo);
@@ -83,9 +100,30 @@ export class SolicitudService {
       } else {
         detalleSolicitud.renglon = this.solicitudOC.detalle[this.solicitudOC.detalle.length - 1].renglon + 1;
       }
-      detalleSolicitud.almacen = (almacen !== undefined) ? almacen.grupo : 'CDG-100';
-      detalleSolicitud.disponible = (almacen !== undefined) ? almacen.saldoUU : detalleSolicitud.disponible;
-      detalleSolicitud.pendiente = detalleSolicitud.cantidad;
+
+
+      if (detalleSolicitud.linea === 'SOBREPEDIDO') {
+        detalleSolicitud.almacen = this.solicitudOC.encabezado.almacen;
+      } else {
+        if (typeof almacen === 'undefined') {
+          for (let i = 0; i < art.rSaldoU.length; i++) {
+            const disponibleAlmacen = art.rSaldoU[i];
+            if (disponibleAlmacen.grupo === this.solicitudOC.encabezado.almacen) {
+              detalleSolicitud.almacen = disponibleAlmacen.grupo;
+              detalleSolicitud.disponible = disponibleAlmacen.saldoUU;
+              break;
+            } else {
+              detalleSolicitud.almacen = disponibleAlmacen.grupo;
+              detalleSolicitud.disponible = disponibleAlmacen.saldoUU;
+              break;
+            }
+          }
+        } else {
+          detalleSolicitud.almacen = almacen.grupo;
+          detalleSolicitud.disponible = almacen.saldoUU;
+        }
+      }
+      
       detalleSolicitud.impuesto = ((detalleSolicitud.precio * 0.16) * detalleSolicitud.cantidad);
 
       let detalleLista: Array<SubdistribuidorD> = [];
@@ -103,8 +141,11 @@ export class SolicitudService {
             if (response !== null) {
               this.solicitudOC.encabezado = response;
               detalleSolicitud.id = this.solicitudOC.encabezado.id;
-              this.solicitudOC.detalle.push(detalleSolicitud);
-              this.messageService.success(`Se ha agregado el articulo ${detalleSolicitud.articulo} a la ${(this.usuarioSD.esAdmin) ? 'orden' : 'solicitud' }`, {nzDuration: 2000});
+              this.totalCarritoPendiente = this.solicitudOC.detalle.push(detalleSolicitud);
+              if (typeof detalleSolicitud.linea === 'string') {
+                this.lineaSolicitud =   detalleSolicitud.linea;
+              }
+              this.messageService.success(`Se ha agregado el articulo ${detalleSolicitud.articulo} a la solicitud`, {nzDuration: 2000});
               this.actualizarEncabezadoOrdenSolicitud();
             } else {
               this.dialog.open(DialogView, {
@@ -130,7 +171,12 @@ export class SolicitudService {
         }).subscribe({
           next: resp => {
             if (resp === -1) {
-              this.solicitudOC.detalle.push(detalleSolicitud);
+              this.totalCarritoPendiente = this.solicitudOC.detalle.push(detalleSolicitud);
+              if (this.solicitudOC.detalle.length === 1) {
+                if (typeof detalleSolicitud.linea === 'string') {
+                  this.lineaSolicitud = detalleSolicitud.linea;
+                }
+              }
               this.messageService.success(`Se ha agregado el articulo ${detalleSolicitud.articulo} a la ${(this.usuarioSD.esAdmin) ? 'orden' : 'solicitud' }`, {nzDuration: 2000});
               this.actualizarEncabezadoOrdenSolicitud();
             } else {
@@ -165,7 +211,7 @@ export class SolicitudService {
         })
       }).subscribe({
         next: data => {
-          this.messageService.success(`Se ha agregado el articulo ${detalleSolicitud.articulo} a la ${(this.usuarioSD.esAdmin) ? 'orden' : 'solicitud' }`, {nzDuration: 2000});
+          this.messageService.success(`Se ha agregado el articulo ${detalleSolicitud.articulo} a la solicitud`, {nzDuration: 2000});
           this.actualizarEncabezadoOrdenSolicitud();
         },
         error: err => {
@@ -175,6 +221,9 @@ export class SolicitudService {
               detalleArt.pendiente = detalleArt.cantidad;
             }
           });
+          if (this.solicitudOC.detalle.length === 0) {
+            this.lineaSolicitud = '';
+          }
           this.calcularImporte();
           this.dialog.open(DialogView, {
             width: '300px',
@@ -185,7 +234,7 @@ export class SolicitudService {
     }
   }
 
-  quitarDetalleSolicitud(detalle: SubdistribuidorD) {
+  quitarDetalleSolicitud(detalle: SubdistribuidorD): void {
     this.http.delete<any>(this.globalService.urlAPI + `SubdistribuidorD/${detalle.id}/${detalle.renglon}`, {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.usuarioSD.token
@@ -195,8 +244,12 @@ export class SolicitudService {
         this.solicitudOC.detalle.forEach((det, indice) => {
           if(det.articulo === detalle.articulo) {
             this.solicitudOC.detalle.splice(indice, 1);
+            this.totalCarritoPendiente = this.solicitudOC.detalle.length;
           }
         });
+        if(this.solicitudOC.detalle.length === 0) {
+          this.lineaSolicitud = '';
+        }
         this.messageService.success(`Se ha quitado el articulo ${detalle.articulo}`, {nzDuration: 2000});
         this.actualizarEncabezadoOrdenSolicitud();
       },
@@ -278,7 +331,7 @@ export class SolicitudService {
       })
     }).subscribe({
       next: data => {
-        console.log('se actualizo la solicitud de orden de compra con ID' + this.solicitudOC.encabezado.id);
+        console.log('se actualizo la solicitud de orden de compra con ID ' + this.solicitudOC.encabezado.id);
       },
       error: err => {
         this.dialog.open(DialogView, {
@@ -290,11 +343,53 @@ export class SolicitudService {
   }
 
   valoresPorDefectoOrdenSolicitud(): void {
+    if (this.usuarioSD.esAdmin) {
+
+      if(this.usuarioSD.cliente?.familia === 'SD AGS' || this.usuarioSD.cliente?.familia === 'SD BAJ' || this.usuarioSD.cliente?.familia === 'SD BAJ 2' || this.usuarioSD.cliente?.familia === 'SD ZAC') {
+        this.solicitudOC.encabezado.sucursal = 1001;
+        if (this.usuarioSD.cliente?.familia === 'SD ZAC') {
+          this.solicitudOC.encabezado.almacen = 'ZAC-100';
+        } else {
+          this.solicitudOC.encabezado.almacen = 'CDG-100';
+        }
+      }
+      
+      if (this.usuarioSD.cliente?.familia === 'SD GDL F' || this.usuarioSD.cliente?.familia === 'SD GDL F2') {
+        this.solicitudOC.encabezado.sucursal = 2001;
+        this.solicitudOC.encabezado.almacen = 'JUP-100';
+      }
+      
+      if (this.usuarioSD.cliente?.familia === 'SD GDL M' || this.usuarioSD.cliente?.familia === 'SD GDL M2') {
+        this.solicitudOC.encabezado.sucursal = 2002;
+        this.solicitudOC.encabezado.almacen = 'NHE-100';
+      }
+
+    } else {
+  
+      if(this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD AGS' || this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD BAJ' || this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD BAJ 2' || this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD ZAC') {
+        this.solicitudOC.encabezado.sucursal = 1001;
+        if (this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD ZAC') {
+          this.solicitudOC.encabezado.almacen = 'ZAC-100';
+        } else {
+          this.solicitudOC.encabezado.almacen = 'CDG-100';
+        }
+      }
+      
+      if (this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD GDL F' || this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD GDL F2') {
+        this.solicitudOC.encabezado.sucursal = 2001;
+        this.solicitudOC.encabezado.almacen = 'JUP-100';
+      }
+      
+      if (this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD GDL M' || this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD GDL M2') {
+        this.solicitudOC.encabezado.sucursal = 2002;
+        this.solicitudOC.encabezado.almacen = 'NHE-100';
+      }
+    }
+
     this.solicitudOC.encabezado.id = undefined;
     this.solicitudOC.encabezado.estatus = 'PENDIENTE';
     this.solicitudOC.encabezado.importe = 0;
     this.solicitudOC.encabezado.impuestos = 0;
-    this.solicitudOC.encabezado.almacen = 'CDG-100';
     this.solicitudOC.encabezado.empresa = 'VHA';
     this.solicitudOC.encabezado.rSubdistribuidorD = [];
     this.solicitudOC.encabezado.cliente = (this.usuarioSD.esAdmin) ? this.usuarioSD.cliente?.cliente : this.usuarioSD.agente?.rAgenteCte.cliente;
@@ -307,10 +402,12 @@ export class SolicitudService {
     this.solicitudOC.encabezado.observaciones = '';
     this.solicitudOC.encabezado.agente = (this.usuarioSD.esAdmin) ? '' : this.usuarioSD.agente?.rAgenteCte.agente;
     this.solicitudOC.detalle = [];
+    this.lineaSolicitud = '';
+    this.totalCarritoPendiente = 0;
   }
 
-  afectarSolicitud(): void {
-    this.http.post<ResultadoAfectar>(this.globalService.urlAPI + 'Subdistribuidor/Afectar', this.solicitudOC.encabezado.id, {
+  afectarSolicitud(estatus: string): void {
+    this.http.get<ResultadoAfectar>(this.globalService.urlAPI + `Subdistribuidor/Afectar/${this.solicitudOC.encabezado.id}/${estatus}`, {
          headers: new HttpHeaders({
           Authorization: 'Bearer ' + this.usuarioSD.token
          })
@@ -318,9 +415,10 @@ export class SolicitudService {
       next: response => {
         if (response !== null) {
           if (response.ok === 1) {
-            this.solicitudOC.encabezado.estatus = (this.usuarioSD.esAdmin) ? 'ENVIADA' : 'POR AUTORIZAR';
+            const mensajeOk = (estatus === 'REVISION') ? 'a revisión correctamente' : (estatus === 'POR AUTORIZAR') ? 'a autorización correctamente' : 'correctamente';
+            this.solicitudOC.encabezado.estatus = estatus;
             this.modalService.success({
-              nzTitle: 'Se enviado la solicitud correctamente',
+              nzTitle: `Se enviado la solicitud ${mensajeOk}`,
               nzOkText: 'Ver',
               nzCancelText: 'Continuar',
               nzOnCancel: () => {
@@ -329,9 +427,75 @@ export class SolicitudService {
               }
             })
           }
+          else {
+            this.dialog.open(DialogView, {
+              width: '300px',
+              data: {titulo: 'Error', mensaje: 'Ocurrio un error al enviar la solicitud, por favor verifique que su solicitud sea correcta'}
+            })
+          }
         }
       }
     })
   }
+
+
+  verificarMismaLineaSolicitud(articulo?: Articulo): boolean {
+    let resultado: boolean = true;
+    for (let i = 0; i < this.solicitudOC.detalle.length; i++) {
+      const detalle = this.solicitudOC.detalle[i];
+      if(detalle.linea !== articulo?.linea) {
+        resultado = false;
+        break;
+      }
+    }
+    return resultado;
+  } 
+
+
+  verificarExistenciasDetalleSolicitud(): void {
+    let detalleArticulo: string|undefined = undefined;
+    for (let i = 0; i < this.solicitudOC.detalle.length; i++) {
+      const detalle = this.solicitudOC.detalle[i];
+      if(typeof detalle.disponible === 'undefined') {
+          detalleArticulo = detalle.articulo;
+          break;
+      }
+    }
+
+    if(typeof detalleArticulo === 'string') {
+      this.obtenerDisponibleArticulo(detalleArticulo);
+    }
+  }
+
+  obtenerDisponibleArticulo(articulo?: string) {
+    const clienteParam = (this.usuarioSD.esAdmin) ? this.usuarioSD.cliente?.cliente : this.usuarioSD.agente?.rAgenteCte.cliente;
+    this.http.get<Articulo>(this.globalService.urlAPI + `Articulos/ArticuloCliente?Articulo=${articulo}&Cliente=${clienteParam}`, 
+      { 
+        headers: new HttpHeaders({
+          Authorization: 'Bearer ' + this.usuarioSD.token
+        })
+      }
+    ).subscribe({
+      next: response => {
+        this.solicitudOC.detalle.forEach((detalle, indice) => {
+          if (detalle.articulo === response.articulo) {
+            response.rSaldoU.forEach((disponible, indice) => {
+              if (disponible.grupo === detalle.almacen) {
+                detalle.disponible = disponible.saldoUU;
+              }
+            })
+          }
+        })
+        this.verificarExistenciasDetalleSolicitud();
+      },
+      error: err => {
+        this.dialog.open(DialogView, {
+          width: '300px',
+          data: {titulo: 'Error', mensaje: 'Ocurrio un error al obtener la disponibilidad del articulo ' + articulo}
+        })
+      }
+    })
+  }
+
 
 }

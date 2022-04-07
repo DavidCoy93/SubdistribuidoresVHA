@@ -1,16 +1,17 @@
 import { Location } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzModalService } from 'ng-zorro-antd/modal';
 import { ArtFam } from 'src/app/Models/ArtFam';
 import { Articulo } from 'src/app/Models/Articulo';
+import { ArtLinea } from 'src/app/Models/ArtLinea';
 import { Usuario } from 'src/app/Models/Usuario';
 import { GlobalsService } from 'src/app/Services/globals.service';
 import { SolicitudService } from 'src/app/Services/solicitud.service';
+import { DialogView } from '../notificacion/dialogView';
 
 @Component({
   selector: 'app-articulos',
@@ -20,7 +21,8 @@ import { SolicitudService } from 'src/app/Services/solicitud.service';
 export class ArticulosComponent {
 
   listaArticulos: Articulo[] = [];
-  familias: ArtFam[] = [];
+  familias:  Array<ArtFam> = [];
+  articuloLineas: Array<ArtLinea> = [];
   textoBusqueda: string = '';
   urlImages: string = '';
   ignorarLosPrimeros: number = 0;
@@ -28,6 +30,7 @@ export class ArticulosComponent {
   usuario: Usuario = {}
   familiaSeleccionada: string = 'TODAS';
   ParametrosBusqueda = new FormData();
+  lineaSeleccionada: string = 'TODAS'; 
   imgNoDisponible = 'assets/img/Imagen no disponible_B.jpg';
 
 
@@ -39,7 +42,7 @@ export class ArticulosComponent {
     private http: HttpClient,
     private solicitudService: SolicitudService,
     private titleService: Title,
-    private modalService: NzModalService) {
+    private dialog: MatDialog) {
 
     this.titleService.setTitle('Inicio');
     this.usuario = this._globalService.UsuarioLogueado;
@@ -62,45 +65,49 @@ export class ArticulosComponent {
           rClaveProdServ: undefined
         })
         this.familiaSeleccionada = this._globalService.familiaArticulo;
+        this.ObtenerLineasArticulo();
       },
       error: err => {
-        alert("Ocurrio un error al obtener las familias");
-      }
-    });
-
-    this.ParametrosBusqueda.append("IgnorarPrimeros", this.ignorarLosPrimeros.toString());
-    this.ParametrosBusqueda.append("CantidadFilas", this.tamanoPagina.toString());
-    this.ParametrosBusqueda.append("Busqueda", "");
-    this.ParametrosBusqueda.append("Familia", this._globalService.familiaArticulo);
-    //@ts-ignore
-    this.ParametrosBusqueda.append("Cliente", this.usuario.cliente?.cliente);
-
-    this.http.post<Articulo[]>(this._globalService.urlAPI + 'Articulos/ArticulosPorBusquedaFiltrosPaginacion', this.ParametrosBusqueda, 
-      { 
-        headers: new HttpHeaders({
-          Authorization: 'Bearer ' + this.usuario.token
+        this.dialog.open(DialogView, {
+          width: '400px',
+          data: {titulo: 'Error', mensaje: 'Ocurrio un error al obtener las familias'}
         })
-      }
-    ).subscribe({
-      next: data => {
-        this.listaArticulos = data;
-        this.listaArticulos.forEach((art, indice) => {
-          art.Cantidad = 1;
-        })
-      },
-      error: err => {
-        alert("Ocurrio un error al obtener los articulos");
       }
     });
   }
 
+
+  ObtenerLineasArticulo(): void {
+    this.http.get<Array<ArtLinea>>(this._globalService.urlAPI + 'Articulos/LineaArticulos', {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + this.usuario.token
+      })
+    }).subscribe({
+      next: data => {
+        this.articuloLineas = data;
+        this.articuloLineas.unshift({
+          linea: 'TODAS',
+          lineaMaestra: null,
+          clave: null,
+          icono: null
+        });
+        this.lineaSeleccionada = this._globalService.lineaArticulo;
+        this.buscarArticulos();
+      }
+    })
+  }
+
   buscarArticulos(): void {
+
+    const clienteParam = (this.usuario.esAdmin) ? this.usuario.cliente?.cliente : this.usuario.agente?.rAgenteCte.cliente;
+
     this.ParametrosBusqueda.set("IgnorarPrimeros", this.ignorarLosPrimeros.toString());
     this.ParametrosBusqueda.set("CantidadFilas", this.tamanoPagina.toString());
     this.ParametrosBusqueda.set("Busqueda", this.textoBusqueda);
     this.ParametrosBusqueda.set("Familia", this.familiaSeleccionada);
+    this.ParametrosBusqueda.set("Linea", this.lineaSeleccionada);
     //@ts-ignore
-    this.ParametrosBusqueda.set("Cliente", this.usuario.cliente?.cliente);
+    this.ParametrosBusqueda.set("Cliente", clienteParam);
 
     this.http.post<Articulo[]>(this._globalService.urlAPI + 'Articulos/ArticulosPorBusquedaFiltrosPaginacion', this.ParametrosBusqueda, 
       { 
@@ -116,7 +123,10 @@ export class ArticulosComponent {
         })
       },
       error: err => {
-        alert("Ocurrio un error al obtener los articulos");
+        this.dialog.open(DialogView, {
+          width: '400px',
+          data: {titulo: 'Error', mensaje: 'Ocurrio un error al obtener los articulos'}
+        })
       }
     });
   } 
@@ -137,22 +147,19 @@ export class ArticulosComponent {
   }
 
   agregarArticulo(articulo: Articulo): void {
-    if(this.solicitudService.solicitudOC.encabezado.estatus === 'ENVIADA' || this.solicitudService.solicitudOC.encabezado.estatus === 'POR AUTORIZAR') {
-      const tipoMovimiento = (this.usuario.esAdmin) ? 'orden de compra' : 'solicitud de orden de compra';
-      this.modalService.confirm({
-        nzTitle: `¿Desea crear una nueva ${tipoMovimiento}?`,
-        nzOkText: 'Aceptar',
-        nzCancelText: 'Cancelar',
-        nzOnOk: () => {
-          this.solicitudService.valoresPorDefectoOrdenSolicitud();
-          this.solicitudService.agregarDetalleSolicitud(articulo);
-        },
-        nzOnCancel: () => {
-          console.log('CANCELO');
-        }
-      });
-    } else {
+    if (this.solicitudService.verificarMismaLineaSolicitud(articulo)) {
       this.solicitudService.agregarDetalleSolicitud(articulo);
+    } else {
+      this.dialog.open(DialogView, {
+        width: '450px',
+        data: {titulo: 'Error', mensaje: 'No se pueden combinar articulos de stock con articulos de sobrepedido y viceversa, LINEA ACTUAL: ' + this.solicitudService.lineaSolicitud}
+      })
     }
   }
+
+  seleccionarLinea(linea: string): void {
+    this._globalService.lineaArticulo = this.lineaSeleccionada;
+    this.buscarArticulos();
+  }
+
 }

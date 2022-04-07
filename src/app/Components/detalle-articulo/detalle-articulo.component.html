@@ -36,23 +36,27 @@
             </div>
         </div>
     </div>
+
     <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="30" fxFlex.lg="30" fxFlex.xl="30">
         <nz-descriptions [nzTitle]="articulo.descripcion1" nzBordered [nzColumn]="{xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }">
             <nz-descriptions-item nzTitle="SKU">{{articulo.articulo}}</nz-descriptions-item>
             <nz-descriptions-item *ngIf="usuario.esAdmin" nzTitle="Precio"> <b>{{articulo.precioLista | currency}}</b></nz-descriptions-item>
             <nz-descriptions-item nzTitle="Unidad">{{articulo.unidad}}</nz-descriptions-item>
             <nz-descriptions-item nzTitle="Familia">{{articulo.familia}}</nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Linea">{{articulo.linea}}</nz-descriptions-item>
             <nz-descriptions-item nzTitle="Fabricante">{{articulo.fabricante}}</nz-descriptions-item>
         </nz-descriptions>
-        <button mat-raised-button [disabled]="articulo.rSaldoU.length === 0" (click)="agregarArticulo()">
+        <button mat-raised-button [disabled]="articulo.rSaldoU.length === 0 && articulo.linea === 'STOCK'" (click)="agregarArticulo()">
             <mat-icon>shopping_cart</mat-icon>
             <span> Agregar</span>
         </button>
     </div>
-    <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="30" fxFlex.lg="30" fxFlex.xl="30" class="disponibles">
+
+
+    <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="30" fxFlex.lg="30" fxFlex.xl="30" class="disponibles" *ngIf="articulo.linea === 'STOCK'; else tmpSobrepedido">
         <div fxLayout="row" fxFill>
             <div fxFlexOffset="25" fxFlex="50">
-                <table class="table table-striped" *ngIf="articulo.rSaldoU.length != 0; else NoDisponible">
+                <table class="table table-striped" *ngIf="articulo.rSaldoU.length !== 0; else NoDisponible">
                     <thead>
                         <tr>
                             <th>Almacen</th>
@@ -85,4 +89,15 @@
             </div>
         </div>
     </div>
+
+    <ng-template #tmpSobrepedido>
+        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="30" fxFlex.lg="30" fxFlex.xl="30" class="disponibles">
+            <div fxLayout="row" fxFill>
+                <div fxFlexOffset="25" fxFlex="50">
+                    <nz-alert nzType="info" nzMessage="Sobrepedido" nzDescription="Este articulo es de Sobrepedido" nzShowIcon></nz-alert>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+    
 </div>

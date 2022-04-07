@@ -33,6 +33,6 @@ export interface Articulo {
     labelCount?: number,
     rArticuloImagen?: ArticuloImagen,
     imagenBase64: Array<string>,
+    linea?: string,
     Cantidad: number,
-
 }

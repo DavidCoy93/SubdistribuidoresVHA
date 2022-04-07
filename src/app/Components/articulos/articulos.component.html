@@ -10,8 +10,8 @@
     </div>
 </div>
 
-<div fxLayout="row" >
-    <div fxFlexOffset="5" fxFlex="20">
+<div fxLayout="row wrap">
+    <div fxFlexOffset.xs="5" fxFlex.xs="90" fxFlexOffset.sm="5" fxFlex.sm="90" fxFlexOffset.md="5" fxFlex.md="20" fxFlexOffset.lg="5" fxFlex.lg="20" fxFlexOffset.xl="5" fxFlex.xl="20">
         <mat-form-field appearance="standard">
         <mat-label>Familia</mat-label>
         <mat-select [(ngModel)]="familiaSeleccionada" name="familia" (ngModelChange)="seleccionarFamilia($event)">
@@ -19,7 +19,15 @@
         </mat-select>
         </mat-form-field>
     </div>
-    <div fxFlex="70">
+    <div fxFlexOffset.xs="5" fxFlex.xs="90" fxFlexOffset.sm="5" fxFlex.sm="90" fxFlexOffset.md="5" fxFlex.md="20" fxFlexOffset.lg="5" fxFlex.lg="20" fxFlexOffset.xl="5" fxFlex.xl="20">
+        <mat-form-field appearance="standard">
+            <mat-label>Linea</mat-label>
+            <mat-select [(ngModel)]="lineaSeleccionada" name="linea" (ngModelChange)="seleccionarLinea($event)">
+                <mat-option *ngFor="let linea of articuloLineas" [value]="linea.linea">{{linea.linea}}</mat-option>
+            </mat-select>
+            </mat-form-field>
+    </div>
+    <div fxFlex.xs="100" fxFlex.sm="98" fxFlex.md="47" fxFlex.lg="46" fxFlex.xl="46">
         <mat-paginator [length]="50" [pageSize]="tamanoPagina" [pageSizeOptions]="[5, 10, 25, 50]" color="warn" (page)="cambiarPagina($event)">
         </mat-paginator>
     </div>
@@ -37,7 +45,15 @@
                             <nz-card-meta [nzTitle]="articulo.articulo"></nz-card-meta>
                         </ng-template>
                         <div class="descripcionArticulo">
-                            {{articulo.descripcion1}}
+                            <div fxLayout="column" fxFill>
+                                <div fxFlex="100">
+                                    {{articulo.descripcion1}}
+                                </div>
+                                <div fxFlex="100" [ngSwitch]="articulo.linea">
+                                    <nz-tag *ngSwitchCase="'STOCK'" nzColor="success">{{articulo.linea}}</nz-tag>
+                                    <nz-tag *ngSwitchCase="'SOBREPEDIDO'" nzColor="processing">{{articulo.linea}}</nz-tag>
+                                </div>
+                            </div>
                         </div>
                     </nz-card>
                     <ng-template #precioLista>
@@ -50,7 +66,7 @@
                         </ng-template>
                     </ng-template>
                     <ng-template #btnAgregar>
-                        <button mat-raised-button (click)="agregarArticulo(articulo)" [disabled]="articulo.rSaldoU.length === 0">
+                        <button mat-raised-button (click)="agregarArticulo(articulo)" [disabled]="articulo.rSaldoU.length === 0 && articulo.linea === 'STOCK'">
                             <mat-icon>shopping_cart</mat-icon>
                             <span> Agregar</span>
                         </button>
@@ -76,7 +92,17 @@
                             <nz-card-meta [nzTitle]="articulo.articulo"></nz-card-meta>
                         </ng-template>
                         <div class="descripcionArticulo">
-                            {{articulo.descripcion1}}
+                            <div class="descripcionArticulo">
+                                <div fxLayout="column" fxFill>
+                                    <div fxFlex="100">
+                                        {{articulo.descripcion1}}
+                                    </div>
+                                    <div fxFlex="100" [ngSwitch]="articulo.linea">
+                                        <nz-tag *ngSwitchCase="'STOCK'" nzColor="success">{{articulo.linea}}</nz-tag>
+                                        <nz-tag *ngSwitchCase="'SOBREPEDIDO'" nzColor="processing">{{articulo.linea}}</nz-tag>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </nz-card>
                     <ng-template #precioLista>
@@ -89,7 +115,7 @@
                         </ng-template>
                     </ng-template>
                     <ng-template #btnAgregar>
-                        <button mat-raised-button (click)="agregarArticulo(articulo)" [disabled]="articulo.rSaldoU.length === 0">
+                        <button mat-raised-button (click)="agregarArticulo(articulo)" [disabled]="articulo.rSaldoU.length === 0 && articulo.linea === 'STOCK'">
                             <mat-icon>shopping_cart</mat-icon>
                             <span> Agregar</span>
                         </button>

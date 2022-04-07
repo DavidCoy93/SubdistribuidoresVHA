@@ -18,7 +18,6 @@ import { GlobalsService } from 'src/app/Services/globals.service';
 export class HomeComponent implements OnInit {
 
   UsuarioObj: Usuario = {};
-  carritoArticulos: Articulo[] = [];
   verArticulos: boolean = false;
   verCarrito: boolean = false;
   tieneCamaras: boolean = false;

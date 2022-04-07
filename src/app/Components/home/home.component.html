@@ -2,31 +2,6 @@
 
     <div fxFlex="10">
         <mat-toolbar class="mat-elevation-z5">
-            <!-- <div fxLayout="row" fxFill>
-                <div fxFlex.xs="10" fxFlex.sm="10" fxShow.xs fxShow.sm fxHide.md fxHide.lg fxHide.xl>
-                    <div fxLayout="column">
-                        <div  fxFlexOffset="25" fxFlex="50">
-                            <button mat-icon-button aria-label="menu" [mat-menu-trigger-for]="responsiveMenu">
-                                <mat-icon>menu</mat-icon>
-                            </button>
-                            <mat-menu #responsiveMenu>
-                                <button mat-menu-item (click)="abrirModalQR(contentQR)">
-                                    <mat-icon>qr_code_2</mat-icon>
-                                    <span>Buscar por QR</span>
-                                </button>
-                            </mat-menu>
-                        </div>
-                    </div>
-                </div>
-                <div fxFlex.xs="10" fxFlex.sm="10" fxFlex.md="20" fxFlex.sm="20" class="logo">
-                    <div fxLayout="column">
-                        <div  fxFlexOffset="25" fxFlex="50">
-                            <img (click)="mostrarArticulos()" matTooltip="Volver al inicio" src="assets/img/Logotipo_C.png" alt="">
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-
             <div fxShow.xs fxShow.sm fxFlex.xs="10" fxFlex.sm="10" fxHide.lg fxHide.md fxHide.xl [matMenuTriggerFor]="responsiveMenu">
                 <button mat-icon-button aria-label="menu">
                     <mat-icon>menu</mat-icon>
@@ -39,16 +14,16 @@
                 </mat-menu>
             </div>
             
-            <img (click)="mostrarArticulos()" matTooltip="Volver al inicio" fxFlex.xs="30" fxFlex.sm="20" fxFlex.md="15" fxFlex.lg="10" class="logo" src="assets/img/Logotipo_C.png" alt="">
+            <img (click)="mostrarArticulos()" matTooltip="Volver al inicio" fxFlex.xs="30" fxFlex.sm="20" fxFlex.md="15" fxFlex.lg="10" fxFlex.xl="10" [ngClass.xs]="'logo'" [ngClass.sm]="'logo'" [ngClass.md]="'logo'" [ngClass.lg]="'logo'" [ngClass.xl]="'logo-xl'" src="assets/img/Logotipo_C.png" alt="">
             
-            <div fxHide.xs fxHide.sm fxFlexOffset.md="15" fxFlexOffset.lg="20" fxFlex.md="40" fxFlex.lg="40">
+            <div fxHide.xs fxHide.sm fxFlexOffset.md="5" fxFlexOffset.lg="20" fxFlexOffset.xl="20" fxFlexOffset.xl="20" fxFlex.md="35" fxFlex.lg="40" fxFlex.xl="40">
                 <a mat-button (click)="abrirModalQR(contentQR)">
                     <mat-icon>qr_code_2</mat-icon>
                     <span>Buscar por QR</span>
                 </a>
             </div>
         
-            <div fxFlexOffset.xs="40" fxFlexOffset.sm="50" fxFlex.xs="10" fxFlex.sm="10" fxFlex.md="20" fxFlex.lg="20" fxFlex.xl="20">
+            <div fxFlexOffset.xs="40" fxFlexOffset.sm="50" fxFlex.xs="10" fxFlex.sm="10" fxFlex.md="40" fxFlex.lg="20" fxFlex.xl="20">
                 <button  mat-icon-button aria-label="boton usuario" [matMenuTriggerFor]="menuUsuario">
                     <mat-icon>account_circle</mat-icon> <span fxHide.xs fxHide.sm>{{ (UsuarioObj.cliente !== null) ? UsuarioObj.cliente?.nombre : UsuarioObj.agente?.nombre}}</span>
                 </button>
@@ -66,11 +41,10 @@
                         <span>Cerrar sesión</span>
                     </button>
                 </mat-menu>
-
             </div>
         
             <button fxFlex.md="10" fxFlex.lg="10" fxFlex.xl="10" mat-icon-button aria-label="Boton carrito de compra" routerLink="./carrito">
-                <mat-icon [matBadge]="solicitudService.solicitudOC.detalle.length" matBadgeSize="small" matBadgePosition="after" matBadgeColor="accent" matTooltip="Ver carrito">shopping_cart</mat-icon>
+                <mat-icon [matBadge]="solicitudService.totalCarritoPendiente" matBadgeSize="small" matBadgePosition="after" matBadgeColor="accent" matTooltip="Ver carrito">shopping_cart</mat-icon>
             </button>
         </mat-toolbar>
     </div>

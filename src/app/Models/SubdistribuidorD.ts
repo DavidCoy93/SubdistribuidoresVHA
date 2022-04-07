@@ -12,5 +12,6 @@ export interface SubdistribuidorD {
     descuento?: number|null,//valor calculado
     porcentajeDescuento?: number|null, //porcentaje
     observaciones?: string|null,
+    linea?: string,
     disponible?: number
 }

@@ -2,7 +2,13 @@
     height: 50px;
     width: 200px;
     cursor: pointer;
-}z
+}
+
+.logo-xl {
+    height: 90%;
+    width: 200px;
+    cursor: pointer;
+}
 
 .mat-toolbar {
     background-color: white;

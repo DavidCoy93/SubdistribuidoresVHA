@@ -21,7 +21,7 @@ export class DetalleArticuloComponent implements OnInit {
 
   idArticulo: string|null;
   usuario: Usuario = {};
-  articulo: Articulo = {articulo: '', descripcion1: '', precioLista: 0, Cantidad: 1, rSaldoU: [], imagenBase64: []};
+  articulo: Articulo = {articulo: '', descripcion1: '', precioLista: 0, Cantidad: 1, rSaldoU: [], imagenBase64: [], linea: ''};
   almacenSeleccionado?: SaldoU = undefined;
   imagenNoDisponible = 'assets/img/Imagen no disponible_B.jpg'
 
@@ -84,27 +84,15 @@ export class DetalleArticuloComponent implements OnInit {
         data: {titulo: 'Alerta', mensaje: 'Por favor seleccione un almacén de la tabla'}
       })
     } else {
-      if (this.solicitudService.solicitudOC.encabezado.estatus === 'ENVIADA' || this.solicitudService.solicitudOC.encabezado.estatus === 'POR AUTORIZAR') {
-        const tipoMovimiento = (this.usuario.esAdmin) ? 'orden de compra' : 'solicitud de orden de compra';
-        this.modalService.confirm({
-          nzTitle: `¿Desea crear una nueva ${tipoMovimiento}?`,
-          nzOkText: 'Aceptar',
-          nzCancelText: 'Cancelar',
-          nzOnOk: () => {
-            this.solicitudService.valoresPorDefectoOrdenSolicitud();
-            this.solicitudService.agregarDetalleSolicitud(this.articulo, this.almacenSeleccionado);
-          },
-          nzOnCancel: () => {
-            console.log('CANCELO');
-          }
-        });
-      } else {
+      if (this.solicitudService.verificarMismaLineaSolicitud(this.articulo)) {
         this.solicitudService.agregarDetalleSolicitud(this.articulo, this.almacenSeleccionado);
+      } else {
+        this.dialog.open(DialogView, {
+          width: '450px',
+          data: {titulo: 'Error', mensaje: 'No se pueden combinar articulos de stock con articulos de sobrepedido y viceversa, LINEA ACTUAL: ' + this.solicitudService.lineaSolicitud}
+        })
       }
-
-      
     }
-    
   }
 
   seleccionarAlmacen(indice: number, almacen: SaldoU): void { 
