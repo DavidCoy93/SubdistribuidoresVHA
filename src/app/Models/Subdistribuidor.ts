@@ -18,16 +18,25 @@ export interface Subdistribuidor {
     condicion?: string|null,//R
     vencimiento?: Date|null,//R
     vigencia?: Date|null,//R dias primeros
-    descuentoGlobal?: number|null,//R
+    descuentoGlobal: number,//R
     importe: number,//R
     impuestos: number,//R
     origenModulo?: string|null, //SUBD CUANDO SE CONVIERTE A ORDEN 
+    origenID?: number|null,
     origenDocumento?: string|null,// SOLICITUD OC
     origenSerie?: string|null,// SOLICITUD OC
     origenFolio?: number|null, // SOLICITUD OC
+    pedidoID?: number|null,
+    pedidoMov?: string|null,
+    pedidoMovID?: string|null,
+    fechaEmbarque?: Date|null,
+    turnoEmbarque?: string|null, 
     empresa?: string|null, //VHA
     sucursal?: number|null,//NULO
     usuarioAlta?: string|null,//NULO
     fechaAlta?: Date|null,//NULO
-    rSubdistribuidorD: Array<SubdistribuidorD>
+    rSubdistribuidorD: Array<SubdistribuidorD>,
+    nombreAgente?: string,
+    sucursalCliente: number|null,
+    nombreCliente?: string
 }

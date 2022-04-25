@@ -31,7 +31,12 @@ export class LoginComponent {
   { 
     this.titleService.setTitle('Login');
     if(localStorage.getItem('usuario') !== null) {
-      this.router.navigate(['/home/articulos']);
+      const usuarioLogueado = this.globalService.UsuarioLogueado;
+      if (!usuarioLogueado.esUsuarioVHA) {
+        this.router.navigate(['/home/articulos']);  
+      } else {
+        this.router.navigate(['/descuentos_solicitudes']);
+      }
     }
   }
 
@@ -51,6 +56,7 @@ export class LoginComponent {
           UsuarioLogin.success = data.success;
           UsuarioLogin.errors = data.errors;
           UsuarioLogin.esAdmin = (UsuarioLogin.cliente !== null) ? true : false;
+          UsuarioLogin.esUsuarioVHA = (UsuarioLogin.usuario !== null) ? true : false;
           localStorage.setItem('usuario', JSON.stringify(UsuarioLogin));
           location.reload();
         },
@@ -78,6 +84,7 @@ export class LoginComponent {
   }
 
   restablecerContrasena(): void {
+    window.open('https://pruebas2.vitrohogar.com.mx:4434/consultas/Login/Login', '_blank');
   }
 
   get usuario() { return this.loginForm.get('usuario'); }

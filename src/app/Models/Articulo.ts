@@ -15,7 +15,7 @@ export interface Articulo {
     familia?: string,
     fabricante?: string,
     claveFabricante?: string,
-    impuesto1?: number,
+    impuesto1: number,
     unidad?: string,
     UnidadCompra?: string,
     peso?: number,
@@ -26,7 +26,7 @@ export interface Articulo {
     tipoEmpaque?: string,
     precioLista: number,
     rArtUnidad?: ArtUnidad,
-    rArtCosto?: ArtCosto
+    rArtCosto?: ArtCosto,
     rSaldoU: Array<SaldoU>,
     rOferta?: Oferta,
     precioPromocion?: number,
@@ -35,4 +35,5 @@ export interface Articulo {
     imagenBase64: Array<string>,
     linea?: string,
     Cantidad: number,
+    precioM2?: number
 }

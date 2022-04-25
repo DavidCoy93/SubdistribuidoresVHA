@@ -21,7 +21,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
       if(localStorage.getItem('usuario') === null) {
         return this.router.navigate(['/login']).then(() => false);
       } else {
-        return true;
+        return (!this.usuarioLogueado.esUsuarioVHA) ? true : this.router.navigate(['/descuentos_solicitudes']).then(() => false);
       }
       
   }

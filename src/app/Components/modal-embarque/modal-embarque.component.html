@@ -1,0 +1,35 @@
+<div fxLayout="row wrap" fxFill>
+    <div fxFlexOffset.xs="10" fxFlex.xs="80" fxFlexOffset.sm="50" fxFlex.sm="50" fxFlexOffset.md="50" fxFlex.md="50" fxFlexOffset.lg="50" fxFlex.lg="50" fxFlexOffset.xl="50" fxFlex.xl="50">
+        <button mat-raised-button (click)="sugerirFecha()">
+            <mat-icon>calendar_month</mat-icon>
+            <span>Sugerir fecha</span>
+        </button>
+    </div>
+</div>
+<div fxLayout="row wrap">
+    <div fxFlexOffset="10" fxFlex="80">
+        <mat-form-field appearance="standard">
+            <mat-label>Fecha</mat-label>
+            <input matInput [matDatepicker]="datepickerEmbarque" [formControl]="fecha" readonly>
+            <mat-datepicker-toggle matSuffix [for]="datepickerEmbarque"></mat-datepicker-toggle>
+          <!-- #docregion datepicker-actions -->
+            <mat-datepicker #datepickerEmbarque color="warn">
+              <mat-datepicker-actions>
+                <button mat-button matDatepickerCancel>Cancelar</button>
+                <button mat-raised-button color="warn" matDatepickerApply>Seleccionar</button>
+              </mat-datepicker-actions>
+            </mat-datepicker>
+          <!-- #enddocregion datepicker-actions -->
+        </mat-form-field>
+    </div>
+    <div fxFlexOffset="10" fxFlex="80">
+        <mat-form-field appearance="standard">
+            <mat-label>Turno</mat-label>
+            <mat-select [(ngModel)]="turno" name="tipoDoc" [disabled]="true">
+                <mat-option value="">Seleccione un turno</mat-option>
+                <mat-option value="MATUTINO">MATUTINO</mat-option>
+                <mat-option value="VESPERTINO">VESPERTINO</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</div>

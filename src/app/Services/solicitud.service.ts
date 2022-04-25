@@ -22,7 +22,7 @@ export class SolicitudService {
   usuarioSD: Usuario = {};
   fechaActual: Date = new Date();
   public solicitudOC: solicitud = {
-    encabezado: { estatus: 'PENDIENTE', importe: 0, moneda: 'Pesos', impuestos: 0, almacen: 'CDG-100', empresa: 'VHA', rSubdistribuidorD: []}, 
+    encabezado: { estatus: 'PENDIENTE', importe: 0, moneda: 'Pesos', impuestos: 0, almacen: 'CDG-100', empresa: 'VHA', rSubdistribuidorD: [], descuentoGlobal: 0, sucursalCliente: null}, 
     detalle: []
   }
   public lineaSolicitud: string = '';
@@ -69,10 +69,16 @@ export class SolicitudService {
         }
       },
       error: err => {
-        this.dialog.open(DialogView, {
-          width: '300px',
-          data: {titulo: 'Error', mensaje: 'Ocurrio un error al consultar la ultima orden pendiente'}
-        })
+        if (err.status === 401) {
+          localStorage.removeItem('usuario');
+          this.router.navigate(['/login']);
+        } else {
+          this.dialog.open(DialogView, {
+            width: '300px',
+            data: {titulo: 'Error', mensaje: 'Ocurrio un error al consultar la ultima orden pendiente'}
+          })
+        }
+        
       }
     })
   }
@@ -89,7 +95,8 @@ export class SolicitudService {
       porcentajeDescuento: 0,
       pendiente: 1,
       renglon: 0,
-      linea: art.linea
+      linea: art.linea,
+      impuesto: art.impuesto1
     };
 
     const detalleExistente = this.solicitudOC.detalle.find(det => det.articulo === detalleSolicitud.articulo);
@@ -106,17 +113,40 @@ export class SolicitudService {
         detalleSolicitud.almacen = this.solicitudOC.encabezado.almacen;
       } else {
         if (typeof almacen === 'undefined') {
-          for (let i = 0; i < art.rSaldoU.length; i++) {
-            const disponibleAlmacen = art.rSaldoU[i];
-            if (disponibleAlmacen.grupo === this.solicitudOC.encabezado.almacen) {
-              detalleSolicitud.almacen = disponibleAlmacen.grupo;
-              detalleSolicitud.disponible = disponibleAlmacen.saldoUU;
-              break;
-            } else {
-              detalleSolicitud.almacen = disponibleAlmacen.grupo;
-              detalleSolicitud.disponible = disponibleAlmacen.saldoUU;
-              break;
+          let encontroAlmacenPorDefecto: boolean = false;
+          art.rSaldoU.forEach((almacen, indice) => {
+            if (almacen.grupo === this.solicitudOC.encabezado.almacen) {
+              encontroAlmacenPorDefecto = true;
             }
+          })
+
+          if (encontroAlmacenPorDefecto) {
+            for (let i = 0; i < art.rSaldoU.length; i++) {
+              const disponibleAlmacen = art.rSaldoU[i];
+              if (disponibleAlmacen.grupo === this.solicitudOC.encabezado.almacen) {
+                detalleSolicitud.almacen = disponibleAlmacen.grupo;
+                detalleSolicitud.disponible = disponibleAlmacen.saldoUU;
+                break;
+              } 
+            }
+          } else {
+            if (art.rSaldoU.length === 1) {
+              detalleSolicitud.almacen = art.rSaldoU[0].grupo;
+              detalleSolicitud.disponible = art.rSaldoU[0].saldoUU;
+            } else {
+              for (let j = 0; j < art.rSaldoU.length; j++) {
+                const almacen = art.rSaldoU[j];
+                if (almacen.grupo !== 'CDG-100') {
+                  detalleSolicitud.almacen = almacen.grupo;
+                  detalleSolicitud.disponible = almacen.saldoUU;
+                  break;
+                } else {
+                  detalleSolicitud.almacen = almacen.grupo;
+                  detalleSolicitud.disponible = almacen.saldoUU;
+                }
+              }
+            }
+            
           }
         } else {
           detalleSolicitud.almacen = almacen.grupo;
@@ -124,14 +154,12 @@ export class SolicitudService {
         }
       }
       
-      detalleSolicitud.impuesto = ((detalleSolicitud.precio * 0.16) * detalleSolicitud.cantidad);
-
       let detalleLista: Array<SubdistribuidorD> = [];
       detalleLista.push(detalleSolicitud);
 
       if (this.solicitudOC.encabezado.id === undefined && this.solicitudOC.detalle.length === 0) {
-        this.solicitudOC.encabezado.importe = detalleSolicitud.precio;
-        this.solicitudOC.encabezado.impuestos = detalleSolicitud.impuesto;
+        this.solicitudOC.encabezado.importe = ((detalleSolicitud.precio / ((detalleSolicitud.impuesto/100)+1)) * detalleSolicitud.cantidad);
+        this.solicitudOC.encabezado.impuestos = (this.solicitudOC.encabezado.importe * this.globalService.impuesto);
         this.http.post<Subdistribuidor>(this.globalService.urlAPI + 'Subdistribuidor', {encabezado: this.solicitudOC.encabezado, detalle: detalleLista}, { 
           headers: new HttpHeaders({
             Authorization: 'Bearer ' + this.usuarioSD.token
@@ -201,7 +229,6 @@ export class SolicitudService {
           detalleArt.pendiente = detalleArt.cantidad;
           detalleArt.almacen = (almacen !== undefined) ? almacen.grupo : detalleArt.almacen;
           detalleArt.disponible = (almacen !== undefined) ? almacen.saldoUU : detalleArt.disponible;
-          detalleArt.impuesto = ((detalleArt.precio * 0.16) * detalleArt.cantidad);
           detalleSolicitud = detalleArt;
         }
       });
@@ -268,15 +295,14 @@ export class SolicitudService {
     } else {
       this.solicitudOC.encabezado.importe = 0;
       this.solicitudOC.detalle.forEach((det, indice) => {
-        this.solicitudOC.encabezado.importe += det.precio*det.cantidad;
+        this.solicitudOC.encabezado.importe += ((det.precio / ((det.impuesto/100) + 1)) * det.cantidad);
       });
     }
-    this.solicitudOC.encabezado.impuestos = (this.solicitudOC.encabezado.importe * 0.16);
+    this.solicitudOC.encabezado.impuestos = (this.solicitudOC.encabezado.importe * this.globalService.impuesto);
   }
 
   modificarCantidadArticulo(detalle: SubdistribuidorD): void {
     let cantidadAnterior = detalle.pendiente;
-    detalle.impuesto = ((detalle.precio * 0.16) * detalle.cantidad)
     detalle.pendiente = detalle.cantidad;
     this.http.put<any>(this.globalService.urlAPI + `SubdistribuidorD/${detalle.id}/${detalle.renglon}`, detalle, {
       headers: new HttpHeaders({
@@ -291,6 +317,7 @@ export class SolicitudService {
         this.solicitudOC.detalle.forEach((det, indice) => {
           if(det.articulo === detalle.articulo) {
             det.cantidad = cantidadAnterior;
+            det.pendiente = det.cantidad;
           }
         });
         this.calcularImporte();
@@ -323,15 +350,28 @@ export class SolicitudService {
     });
   }
 
-  actualizarEncabezadoOrdenSolicitud(): void {
+  actualizarEncabezadoOrdenSolicitud(propiedadActualizada?: string): void {
     this.calcularImporte();
-    this.http.put(this.globalService.urlAPI + `Subdistribuidor/${this.solicitudOC.encabezado.id}`, this.solicitudOC.encabezado, {
+    this.http.put<number>(this.globalService.urlAPI + `Subdistribuidor/${this.solicitudOC.encabezado.id}`, this.solicitudOC.encabezado, {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + this.usuarioSD.token
       })
     }).subscribe({
       next: data => {
-        console.log('se actualizo la solicitud de orden de compra con ID ' + this.solicitudOC.encabezado.id);
+        if (data === -1) {
+          if (typeof propiedadActualizada === 'string') {
+            if (propiedadActualizada === 'Observaciones') {
+              this.messageService.success('Se han guardado las observaciones', {nzDuration: 2000})
+            }
+          } else {
+            console.log('se actualizo la solicitud de orden de compra con ID ' + this.solicitudOC.encabezado.id);
+          }
+        } else {
+          this.dialog.open(DialogView, {
+            width: '300px',
+            data: {titulo: 'Error', mensaje: 'Ocurrio un error al actualizar la solicitud de orden de compra'}
+          })
+        }
       },
       error: err => {
         this.dialog.open(DialogView, {
@@ -401,6 +441,10 @@ export class SolicitudService {
     this.solicitudOC.encabezado.vigencia = new Date();
     this.solicitudOC.encabezado.observaciones = '';
     this.solicitudOC.encabezado.agente = (this.usuarioSD.esAdmin) ? '' : this.usuarioSD.agente?.rAgenteCte.agente;
+    this.solicitudOC.encabezado.sucursalCliente = null;
+    this.solicitudOC.encabezado.pedidoID = undefined;
+    this.solicitudOC.encabezado.pedidoMov = undefined;
+    this.solicitudOC.encabezado.pedidoMovID = undefined;
     this.solicitudOC.detalle = [];
     this.lineaSolicitud = '';
     this.totalCarritoPendiente = 0;
@@ -415,13 +459,24 @@ export class SolicitudService {
       next: response => {
         if (response !== null) {
           if (response.ok === 1) {
-            const mensajeOk = (estatus === 'REVISION') ? 'a revisión correctamente' : (estatus === 'POR AUTORIZAR') ? 'a autorización correctamente' : 'correctamente';
+            this.totalCarritoPendiente = 0;
+            const mensajeOk = (estatus === 'POR REVISAR') ? 'a revisión correctamente' : (estatus === 'POR AUTORIZAR') ? 'a autorización correctamente' : 'correctamente';
             this.solicitudOC.encabezado.estatus = estatus;
             this.modalService.success({
               nzTitle: `Se enviado la solicitud ${mensajeOk}`,
               nzOkText: 'Ver',
               nzCancelText: 'Continuar',
+              nzOnOk: () => {
+                if (response.resultado !== null) {
+                  //@ts-ignore
+                  this.solicitudOC.encabezado = response.resultado;
+                  //@ts-ignore
+                  this.solicitudOC.detalle = response.resultado?.rSubdistribuidorD;
+                }
+                this.modalService.closeAll();
+              },
               nzOnCancel: () => {
+                this.modalService.closeAll();
                 this.valoresPorDefectoOrdenSolicitud();
                 this.router.navigate(['/home'])
               }
@@ -430,10 +485,23 @@ export class SolicitudService {
           else {
             this.dialog.open(DialogView, {
               width: '300px',
-              data: {titulo: 'Error', mensaje: 'Ocurrio un error al enviar la solicitud, por favor verifique que su solicitud sea correcta'}
+              data: {titulo: response.titulo, mensaje: response.descripcion}
             })
           }
+        } else {
+          this.modalService.closeAll();
+          this.dialog.open(DialogView, {
+            width: '300px',
+            data: {titulo: 'Error', mensaje: 'Ocurrio un error al enviar la solicitud, por favor contacte al area de sistemas de vitrohogar'}
+          })
         }
+      },
+      error: err => {
+        this.modalService.closeAll();
+        this.dialog.open(DialogView, {
+          width: '300px',
+          data: {titulo: 'Error', mensaje: 'Ocurrio un error al enviar la solicitud, por favor contacte al area de sistemas de vitrohogar'}
+        })
       }
     })
   }

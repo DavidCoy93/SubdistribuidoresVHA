@@ -43,3 +43,12 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+@media screen and (max-width: 920px) and (orientation: landscape) {
+    .ScrollableContent {
+        height: auto;
+        overflow-y: auto;
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
+}

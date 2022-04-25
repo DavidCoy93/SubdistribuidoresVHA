@@ -1,27 +1,27 @@
 <nz-page-header [nzTitle]="titulo" nzBackIcon>
 </nz-page-header>
 
-<div fxLayout="row">
-    <div fxFlexOffset="10" fxFlex.xs="30" fxFlex.sm="30" fxFlex.md="20" fxFlex.lg="20" fxFlex.xl="20">
+<div fxLayout="row wrap">
+    <div fxFlexOffset.xs="10" fxFlex.xs="80"  fxFlexOffset.sm="10" fxFlex.sm="80" fxFlexOffset.md="10" fxFlex.md="35" fxFlexOffset.lg="10" fxFlex.lg="35" fxFlexOffset.xl="10" fxFlex.xl="35">
         <mat-form-field appearance="standard">
-            <mat-label>Tipo</mat-label>
-            <mat-select [(ngModel)]="tipoDocumento" name="tipoDoc">
+            <mat-label>Documento</mat-label>
+            <mat-select [(ngModel)]="tipoDocumento" name="tipoDoc" (ngModelChange)="buscarOrdenesSolicitudes()">
                 <mat-option value="">TODOS</mat-option>
-                <!-- <mat-option value="1">Agente 1</mat-option>
-                <mat-option value="2">Agente 2</mat-option> -->
+                <mat-option value="Solicitud Orden Compra">Solicitud Orden Compra</mat-option>
+                <mat-option value="Orden de compra">Orden de compra</mat-option>
             </mat-select>
         </mat-form-field>
     </div>
-    <div fxFlexOffset="10" fxFlex.xs="30" fxFlex.sm="30" fxFlex.md="20" fxFlex.lg="20" fxFlex.xl="20">
+    <div fxFlexOffset.xs="10" fxFlex.xs="80" fxFlexOffset.sm="10" fxFlex.sm="80" fxFlexOffset.md="5" fxFlex.md="35" fxFlexOffset.lg="5" fxFlex.lg="35"  fxFlexOffset.xl="5" fxFlex.xl="35">
         <mat-form-field appearance="standard">
             <mat-label>Fecha</mat-label>
-            <input matInput [matDatepicker]="datepicker">
+            <input matInput [matDatepicker]="datepicker" [formControl]="fecha">
             <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
           <!-- #docregion datepicker-actions -->
             <mat-datepicker #datepicker>
               <mat-datepicker-actions>
                 <button mat-button matDatepickerCancel>Cancelar</button>
-                <button mat-raised-button color="primary" matDatepickerApply>Aplicar</button>
+                <button mat-raised-button color="primary" matDatepickerApply (click)="buscarOrdenesSolicitudes()">Seleccionar</button>
               </mat-datepicker-actions>
             </mat-datepicker>
           <!-- #enddocregion datepicker-actions -->
@@ -35,34 +35,45 @@
             <nz-list-item *ngFor="let solicitud of solicitudesOrdenes">
                 <div fxLayout.xs="column wrap" fxLayout.sm="column wrap"  fxLayout.md="row" fxLayout.lg="row" fxLayout.xl="row" fxLayoutAlign.md="space-around center" fxLayoutAlign.lg="space-around center" fxLayoutAlign.xl="space-around center" fxFill>
                     <ng-container *ngIf="usuarioSD.esAdmin; else TemplateAgente">
-                        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="20" fxFlex.lg="20" fxFlex.xl="20">
-                            Tipo: <b>{{solicitud.documento}}</b>
+                        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="15" fxFlex.lg="15" fxFlex.xl="15">
+                            <b>{{solicitud.documento}}</b>
                         </div>
-                        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="10" fxFlex.lg="10" fxFlex.xl="10">
+                        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="5" fxFlex.lg="5" fxFlex.xl="5">
                             Folio: <b>{{solicitud.folio}}</b>
                         </div>
-                        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="20" fxFlex.lg="20" fxFlex.xl="20">
-                            fecha Alta: <b>{{solicitud.fechaAlta | date: 'dd/MM/YYYY'}}</b>
+                        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="18" fxFlex.lg="20" fxFlex.xl="20">
+                            fecha Alta: <b>{{solicitud.fechaAlta | date: 'dd/MM/YYYY HH:MM:SS'}}</b>
                         </div>
-                        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="20" fxFlex.lg="20" fxFlex.xl="20">
+                        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="10" fxFlex.lg="15" fxFlex.xl="15">
                             Total: <b>{{(solicitud.importe + solicitud.impuestos) | currency}}</b>
                         </div>
-                        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="20" fxFlex.lg="20" fxFlex.xl="20">
+                        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="14" fxFlex.lg="10" fxFlex.xl="10">
                             <nz-list-item-extra [ngSwitch]="solicitud.estatus">
                                 <nz-tag *ngSwitchCase="'PENDIENTE'" nzColor="processing">{{solicitud.estatus}}</nz-tag>
-                                <nz-tag *ngSwitchCase="'ENVIADA'" nzColor="success">{{solicitud.estatus}}</nz-tag>
                                 <nz-tag *ngSwitchCase="'CONCLUIDO'" nzColor="success">{{solicitud.estatus}}</nz-tag>
+                                <nz-tag *ngSwitchCase="'POR REVISAR'" nzColor="warning">{{solicitud.estatus}}</nz-tag>
+                                <nz-tag *ngSwitchCase="'REVISADO'" nzColor="warning">{{solicitud.estatus}}</nz-tag>
+                                <nz-tag *ngSwitchCase="'ENVIADA'" nzColor="success">{{solicitud.estatus}}</nz-tag>
                                 <nz-tag *ngSwitchCase="'POR AUTORIZAR'" nzColor="warning">{{solicitud.estatus}}</nz-tag>
-                                <nz-tag *ngSwitchCase="'REVISION'" nzColor="warning">{{solicitud.estatus}}</nz-tag>
+                                <nz-tag *ngSwitchCase="'RECHAZADO'" nzColor="error">{{solicitud.estatus}}</nz-tag>
                             </nz-list-item-extra>
                         </div>
-                        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="10" fxFlex.lg="10" fxFlex.xl="10">
-                            <mat-icon *ngIf="solicitud.documento === 'Solicitud Orden Compra'" matTooltip="Ver" (click)="verDetalleOrdenSolicitud(solicitud.id)">visibility</mat-icon>
+                        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="20" fxFlex.lg="15" fxFlex.xl="15">
+                            <button mat-raised-button *ngIf="solicitud.documento === 'Orden de compra' && solicitud.sucursalCliente !== null" (click)="AsignarFechaEnvioOrdenCompra(solicitud)">
+                                <mat-icon>local_shipping</mat-icon>
+                                <span>Envio a domicilio</span>
+                            </button>
+                            <ng-container *ngIf="solicitud.documento === 'Solicitud Orden Compra' && solicitud.nombreAgente !== undefined">
+                                Agente: <b>{{solicitud.nombreAgente}}</b>
+                            </ng-container>
+                        </div>
+                        <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="3" fxFlex.lg="10" fxFlex.xl="10">
+                            <mat-icon matTooltip="Ver" (click)="verDetalleOrdenSolicitud(solicitud.id)">visibility</mat-icon>
                         </div>
                     </ng-container>
                     <ng-template #TemplateAgente>
                         <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="30" fxFlex.lg="30" fxFlex.xl="30">
-                            Tipo: <b>{{solicitud.documento}}</b>
+                            <b>{{solicitud.documento}}</b>
                         </div>
                         <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="10" fxFlex.lg="10" fxFlex.xl="10">
                             Folio: <b>{{solicitud.folio}}</b>
@@ -73,14 +84,14 @@
                         <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="20" fxFlex.lg="20" fxFlex.xl="20">
                             <nz-list-item-extra [ngSwitch]="solicitud.estatus">
                                 <nz-tag *ngSwitchCase="'PENDIENTE'" nzColor="processing">{{solicitud.estatus}}</nz-tag>
-                                <nz-tag *ngSwitchCase="'ENVIADA'" nzColor="success">{{solicitud.estatus}}</nz-tag>
-                                <nz-tag *ngSwitchCase="'CONCLUIDO'" nzColor="success">{{solicitud.estatus}}</nz-tag>
+                                <nz-tag *ngSwitchCase="'CONCLUIDO'" nzColor="success">{{'AUTORIZADO'}}</nz-tag>
                                 <nz-tag *ngSwitchCase="'POR AUTORIZAR'" nzColor="warning">{{solicitud.estatus}}</nz-tag>
-                                <nz-tag *ngSwitchCase="'REVISION'" nzColor="warning">{{solicitud.estatus}}</nz-tag>
+                                <nz-tag *ngSwitchCase="'POR REVISAR'" nzColor="warning">{{solicitud.estatus}}</nz-tag>
+                                <nz-tag *ngSwitchCase="'RECHAZADO'" nzColor="error">{{solicitud.estatus}}</nz-tag>
                             </nz-list-item-extra>
                         </div>
                         <div fxFlex.xs="100" fxFlex.sm="100" fxFlex.md="10" fxFlex.lg="10" fxFlex.xl="10">
-                            <mat-icon *ngIf="solicitud.documento === 'Solicitud Orden Compra'" matTooltip="Ver" (click)="verDetalleOrdenSolicitud(solicitud.id)">visibility</mat-icon>
+                            <mat-icon matTooltip="Ver" (click)="verDetalleOrdenSolicitud(solicitud.id)">visibility</mat-icon>
                         </div>
                     </ng-template>
                 </div>

@@ -1,0 +1,47 @@
+.scrollableArea {
+    height: auto;
+    overflow-y: scroll;
+}
+
+.table thead {
+    background-color: #ff0000;
+    color: #fff;
+    text-align: center;
+}
+
+button.mat-raised-button {
+    background-color: #ff0000 !important;
+    color: #fff !important;
+}
+
+.centrarTextoFila {
+    text-align: center;
+}
+
+.logoVHA {
+    height: 90%;
+    width: 80%;
+}
+
+.logoVHA_sm {
+    height: 90%;
+    width: 155%;
+}
+
+.logoVHA_lg {
+    height: 90%;
+    width: 65%;
+}
+
+.logoVHA_xl {
+    height: 90%;
+    width: 45%;
+}
+
+mat-toolbar {
+    background-color: #fff;
+}
+
+input[type=number] {
+    width: 35%;
+}

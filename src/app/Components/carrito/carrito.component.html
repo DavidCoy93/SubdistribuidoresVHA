@@ -1,14 +1,22 @@
 <nz-page-header *ngIf="solicitudService.solicitudOC.encabezado.id !== undefined" [nzTitle]="titulo" nzBackIcon nz-tooltip [nzTooltipTitle]="titulo" [nzTooltipMouseEnterDelay]="3" [nzTooltipMouseLeaveDelay]="1" [nzTooltipTrigger]="'hover'">
     <nz-page-header-tags [ngSwitch]="solicitudService.solicitudOC.encabezado.estatus">
         <nz-tag *ngSwitchCase="'PENDIENTE'" nzColor="processing">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
-        <nz-tag *ngSwitchCase="'ENVIADA'" nzColor="success">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
         <nz-tag *ngSwitchCase="'POR AUTORIZAR'" nzColor="warning">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
-        <nz-tag *ngSwitchCase="'CONCLUIDO'" nzColor="success">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
-        <nz-tag *ngSwitchCase="'REVISION'" nzColor="warning">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
+        <nz-tag *ngSwitchCase="'CONCLUIDO'" nzColor="success">{{ (usuario.esAdmin) ? solicitudService.solicitudOC.encabezado.estatus : 'AUTORIZADO'}}</nz-tag>
+        <nz-tag *ngSwitchCase="'POR REVISAR'" nzColor="warning">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
+        <nz-tag *ngSwitchCase="'REVISADO'" nzColor="warning">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
+        <nz-tag *ngSwitchCase="'RECHAZADO'" nzColor="error">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
+        <nz-tag *ngSwitchCase="'ENVIADA'" nzColor="success">{{solicitudService.solicitudOC.encabezado.estatus}}</nz-tag>
     </nz-page-header-tags>
     <nz-page-header-extra>
-        <button mat-raised-button *ngIf="solicitudService.solicitudOC.detalle.length > 0 && solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'" (click)="enviarOrden((usuario.esAdmin) ? 'ENVIADA' : 'POR AUTORIZAR')">
+        <button mat-raised-button *ngIf="solicitudService.solicitudOC.detalle.length > 0 && solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE' && usuario.esAdmin" (click)="verModalEnvioADomicilio('POR REVISAR')">
+            <span >Revisión</span>
+        </button>
+        <button mat-raised-button *ngIf="solicitudService.solicitudOC.detalle.length > 0 && solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'" (click)="enviarOrden()">
             <span >{{ (usuario.esAdmin) ? 'Enviar solicitud' : 'Enviar a autorización' }}</span>
+        </button>
+        <button mat-raised-button *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'REVISADO'" (click)="aceptarDescuento()">
+            <span >Estoy de acuerdo</span>
         </button>
     </nz-page-header-extra>
 </nz-page-header>
@@ -31,6 +39,8 @@
                             <th class="centrarTexto" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'">Disponible</th>
                             <th class="centrarTexto">Cantidad</th>
                             <th class="centrarTexto" *ngIf="usuario.esAdmin">Precio</th>
+                            <th class="centrarTexto" *ngIf="usuario.esAdmin">Importe</th>
+                            <th class="centrarTexto" *ngIf="usuario.esAdmin && (solicitudService.solicitudOC.encabezado.estatus === 'REVISADO' || solicitudService.solicitudOC.encabezado.estatus === 'ENVIADA' || solicitudService.solicitudOC.encabezado.estatus === 'CONCLUIDO')">Descuento</th>
                             <th class="centrarTexto">Almacén</th>
                             <th class="centrarTexto">Linea</th>
                             <th class="centrarTexto" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'">Opciones</th>
@@ -47,6 +57,8 @@
                                 <input style="width: 50px;" [disabled]="solicitudService.solicitudOC.encabezado.estatus !== 'PENDIENTE'" type="number" [(ngModel)]="articulo.cantidad" (change)="solicitudService.modificarCantidadArticulo(articulo)">
                             </td>
                             <td *ngIf="usuario.esAdmin" class="centrarTexto">{{articulo.precio | currency}}</td>
+                            <td *ngIf="usuario.esAdmin" class="centrarTexto">{{ ((articulo.precio / ((articulo.impuesto/100) + 1)) * articulo.cantidad ) | currency}}</td>
+                            <td *ngIf="usuario.esAdmin && (solicitudService.solicitudOC.encabezado.estatus=== 'REVISADO' || solicitudService.solicitudOC.encabezado.estatus === 'ENVIADA' || solicitudService.solicitudOC.encabezado.estatus === 'CONCLUIDO')"  class="centrarTexto">{{ articulo.descuento | currency}}</td>
                             <td class="centrarTexto almacen" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE' && articulo.linea === 'STOCK' ; else almacenDesactivado" [ngSwitch]="articulo.almacen" (click)="verDisponibles(articulo, indice)">
                                 <ng-container *ngSwitchCase="'AYU-100'">AYUNTAMIENTO, AGS</ng-container>
                                 <ng-container *ngSwitchCase="'BLV-100'">BLV A ZAC, AGS</ng-container>
@@ -95,7 +107,7 @@
             <mat-form-field appearance="standard">
                 <mat-label>Observaciones</mat-label>
                 <input type="text" matInput [(ngModel)]="solicitudService.solicitudOC.encabezado.observaciones" [readonly]="solicitudService.solicitudOC.encabezado.estatus !=='PENDIENTE'">
-                <mat-icon *ngIf="solicitudService.solicitudOC.encabezado.estatus ==='PENDIENTE'" (click)="solicitudService.actualizarEncabezadoOrdenSolicitud()" matSuffix matTooltip="Guardar" style="color: green;">done</mat-icon>
+                <mat-icon *ngIf="solicitudService.solicitudOC.encabezado.estatus ==='PENDIENTE'" (click)="solicitudService.actualizarEncabezadoOrdenSolicitud('Observaciones')" matSuffix matTooltip="Guardar" style="color: green;">done</mat-icon>
             </mat-form-field>
         </div>
         <div fxFlex.md="40" fxFlex.lg="40" fxFlex.xl="40" *ngIf="usuario.esAdmin">
@@ -119,6 +131,48 @@
                             <div fxLayout="row" fxFill>
                                 <div fxFlex="80" class="monto">
                                     <span>{{solicitudService.solicitudOC.encabezado.importe | currency}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div fxLayout="row" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'REVISADO' || solicitudService.solicitudOC.encabezado.estatus === 'ENVIADA' || solicitudService.solicitudOC.encabezado.estatus === 'CONCLUIDO'">
+                <div fxFlexOffset.md="20" fxFlex.md="80" fxFlexOffset.lg="20" fxFlex.lg="80" fxFlexOffset.xl="20" fxFlex.xl="80" class="concepto">
+                    <div fxLayout="row" fxFill>
+                        <div fxFlex="50">
+                            <div fxLayout="row" fxFill>
+                                <div fxFlexOffset="10" fxFlex="30">
+                                    <span>Descuento</span>        
+                                </div>
+                            </div>
+                        </div>
+                        <div fxFlex="50">
+                            <div fxLayout="row" fxFill>
+                                <div fxFlex="80" class="monto">
+                                    <span>{{(solicitudService.solicitudOC.encabezado.descuentoGlobal > 0) ? '-' : '' }}{{solicitudService.solicitudOC.encabezado.descuentoGlobal | currency}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div fxLayout="row" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'REVISADO' || solicitudService.solicitudOC.encabezado.estatus === 'ENVIADA' || solicitudService.solicitudOC.encabezado.estatus === 'CONCLUIDO'">
+                <div fxFlexOffset.md="20" fxFlex.md="80" fxFlexOffset.lg="20" fxFlex.lg="80" fxFlexOffset.xl="20" fxFlex.xl="80" class="concepto">
+                    <div fxLayout="row" fxFill>
+                        <div fxFlex="50">
+                            <div fxLayout="row" fxFill>
+                                <div fxFlexOffset="10" fxFlex="30">
+                                    <span>Subtotal</span>        
+                                </div>
+                            </div>
+                        </div>
+                        <div fxFlex="50">
+                            <div fxLayout="row" fxFill>
+                                <div fxFlex="80" class="monto">
+                                    <span>{{ solicitudService.solicitudOC.encabezado.importe - solicitudService.solicitudOC.encabezado.descuentoGlobal  | currency}}</span>
                                 </div>
                             </div>
                         </div>
@@ -186,7 +240,7 @@
                     <mat-form-field appearance="standard">
                         <mat-label>Observaciones</mat-label>
                         <input type="text" matInput [(ngModel)]="solicitudService.solicitudOC.encabezado.observaciones" [readonly]="solicitudService.solicitudOC.encabezado.estatus !=='PENDIENTE'">
-                        <mat-icon *ngIf="solicitudService.solicitudOC.encabezado.estatus ==='PENDIENTE'" (click)="solicitudService.actualizarEncabezadoOrdenSolicitud()" matSuffix matTooltip="Guardar" style="color: green;">done</mat-icon>
+                        <mat-icon *ngIf="solicitudService.solicitudOC.encabezado.estatus ==='PENDIENTE'" (click)="solicitudService.actualizarEncabezadoOrdenSolicitud('Observaciones')" matSuffix matTooltip="Guardar" style="color: green;">done</mat-icon>
                     </mat-form-field>
                 </div>
             </div>
@@ -212,6 +266,48 @@
                             <div fxLayout="row" fxFill>
                                 <div fxFlex="80" class="monto">
                                     <span>{{solicitudService.solicitudOC.encabezado.importe | currency}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div fxLayout="row" *ngIf="solicitudService.solicitudOC.encabezado.estatus==='REVISADO' || solicitudService.solicitudOC.encabezado.estatus === 'ENVIADA' || solicitudService.solicitudOC.encabezado.estatus === 'CONCLUIDO'">
+                <div fxFlexOffset.xs="10" fxFlex.xs="80" fxFlexOffset.sm="10" fxFlex.sm="80" class="concepto">
+                    <div fxLayout="row" fxFill>
+                        <div fxFlex="50">
+                            <div fxLayout="row" fxFill>
+                                <div fxFlexOffset="10" fxFlex="30">
+                                    <span>Descuento</span>        
+                                </div>
+                            </div>
+                        </div>
+                        <div fxFlex="50">
+                            <div fxLayout="row" fxFill>
+                                <div fxFlex="80" class="monto">
+                                    <span>{{(solicitudService.solicitudOC.encabezado.descuentoGlobal > 0) ? '-' : '' }}{{solicitudService.solicitudOC.encabezado.descuentoGlobal| currency}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div fxLayout="row" *ngIf="solicitudService.solicitudOC.encabezado.estatus==='REVISADO' || solicitudService.solicitudOC.encabezado.estatus === 'ENVIADA' || solicitudService.solicitudOC.encabezado.estatus === 'CONCLUIDO'">
+                <div fxFlexOffset.xs="10" fxFlex.xs="80" fxFlexOffset.sm="10" fxFlex.sm="80" class="concepto">
+                    <div fxLayout="row" fxFill>
+                        <div fxFlex="50">
+                            <div fxLayout="row" fxFill>
+                                <div fxFlexOffset="10" fxFlex="30">
+                                    <span>Subtotal</span>        
+                                </div>
+                            </div>
+                        </div>
+                        <div fxFlex="50">
+                            <div fxLayout="row" fxFill>
+                                <div fxFlex="80" class="monto">
+                                    <span>{{ solicitudService.solicitudOC.encabezado.importe - solicitudService.solicitudOC.encabezado.descuentoGlobal | currency}}</span>
                                 </div>
                             </div>
                         </div>

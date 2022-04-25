@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewContainerRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Title } from '@angular/platform-browser';
 import { NzModalService } from 'ng-zorro-antd/modal';
@@ -8,6 +8,7 @@ import { ResultadoAfectar } from 'src/app/Models/ResultadoAfectar';
 import { Subdistribuidor } from 'src/app/Models/Subdistribuidor';
 import { Usuario } from 'src/app/Models/Usuario';
 import { GlobalsService } from 'src/app/Services/globals.service';
+import { ModalConfirmacionComponent } from '../modal-confirmacion/modal-confirmacion.component';
 import { DialogView } from '../notificacion/dialogView';
 
 @Component({
@@ -18,90 +19,6 @@ import { DialogView } from '../notificacion/dialogView';
 export class SolicitudesAgenteComponent implements OnInit {
 
   agente: string = '';
-  // solicitudesAgente: Array<Subdistribuidor> = [
-  //   {
-  //     id: 1011,
-  //     folio: 1,
-  //     importe: 2015,
-  //     impuestos: 322.4,
-  //     almacen: 'CDG-100',
-  //     cliente: '0000730',
-  //     condicion: 'Algo',
-  //     documento: 'Solicitud Orden Compra',
-  //     empresa: 'VHA',
-  //     moneda: 'Pesos',
-  //     estatus: 'Por autorizar',
-  //     fecha: new Date(),
-  //     fechaAlta: new Date(),
-  //     rSubdistribuidorD: [
-  //       {
-  //         cantidad: 1,
-  //         pendiente: 1,
-  //         precio: 666,
-  //         articulo: 'LATU11',
-  //         almacen: 'CDG-100',
-  //         descripcion: 'Cualquier descripción',
-  //         descuento: 0,
-  //         id: 1011,
-  //         impuesto: ((666 * 1) * 0.16),
-  //         renglon: 1
-  //       },
-  //       {
-  //         cantidad: 1,
-  //         pendiente: 1,
-  //         precio: 1349,
-  //         articulo: 'LATU12',
-  //         almacen: 'CDG-100',
-  //         descripcion: 'Cualquier descripción',
-  //         descuento: 0,
-  //         id: 1011,
-  //         impuesto: ((1349 * 1) * 0.16),
-  //         renglon: 2
-  //       }
-  //     ],
-  //   },
-  //   {
-  //     id: 1012,
-  //     folio: 2,
-  //     importe: 1349,
-  //     impuestos: 215.84,
-  //     almacen: 'CDG-100',
-  //     cliente: '0000730',
-  //     condicion: 'Algo',
-  //     documento: 'Solicitud Orden Compra',
-  //     empresa: 'VHA',
-  //     moneda: 'Pesos',
-  //     estatus: 'Por autorizar',
-  //     fecha: new Date(),
-  //     fechaAlta: new Date(),
-  //     rSubdistribuidorD: [
-  //       {
-  //         cantidad: 1,
-  //         pendiente: 1,
-  //         precio: 999,
-  //         articulo: 'LACA41BE',
-  //         almacen: 'CDG-100',
-  //         descripcion: 'Cualquier descripción',
-  //         descuento: 0,
-  //         id: 1011,
-  //         impuesto: ((999 * 1) * 0.16),
-  //         renglon: 1
-  //       },
-  //       {
-  //         cantidad: 1,
-  //         pendiente: 1,
-  //         precio: 350,
-  //         articulo: 'LACA41BF',
-  //         almacen: 'CDG-100',
-  //         descripcion: 'Cualquier descripción',
-  //         descuento: 0,
-  //         id: 1011,
-  //         impuesto: ((350 * 1) * 0.16),
-  //         renglon: 2
-  //       }
-  //     ],
-  //   },
-  // ]
   usuarioSD: Usuario = {};
   solicitudesAgente: Array<Subdistribuidor> = [];
   agentes: Array<Agente> = [];
@@ -111,7 +28,8 @@ export class SolicitudesAgenteComponent implements OnInit {
     private globalService: GlobalsService,
     private modalService: NzModalService,
     private http: HttpClient,
-    private dialog: MatDialog) 
+    private dialog: MatDialog,
+    private viewContainerRef: ViewContainerRef) 
   { 
     this.titleService.setTitle('Solicitudes Agentes');
     this.usuarioSD = this.globalService.UsuarioLogueado;
@@ -130,7 +48,18 @@ export class SolicitudesAgenteComponent implements OnInit {
       })
     }).subscribe({
       next: response => {
-        this.solicitudesAgente = response;
+        if (response !== null) {
+          this.solicitudesAgente = response;
+          this.solicitudesAgente.forEach((solicitud, indice) => {
+            this.agentes.forEach((agente, index) => {
+              if (solicitud.agente === agente.agenteID) {
+                solicitud.nombreAgente = agente.nombre;
+              }
+            })
+          })
+        } else {
+          this.solicitudesAgente = [];
+        }
       },
       error: err => {
         this.dialog.open(DialogView, {
@@ -142,43 +71,99 @@ export class SolicitudesAgenteComponent implements OnInit {
   }
 
   autorizarRechazarSolicitud(solicitud: Subdistribuidor, estatus: string): void {
-    const botonOkTexto = (estatus === 'AUTORIZAR') ? 'Autorizar' : 'Rechazar';
-    this.modalService.confirm({
-      nzTitle: '¿Esta seguro de continuar?',
-      nzOkText: botonOkTexto,
-      nzCancelText: 'Cancelar',
-      nzOnOk: () => {
-        console.log('Acepto Autorizar')
-        this.http.get<ResultadoAfectar>(this.globalService.urlAPI + `Subdistribuidor/Afectar/${solicitud.id}/${estatus}`, {
-          headers: new HttpHeaders({
-           Authorization: 'Bearer ' + this.usuarioSD.token
-          })
-        }).subscribe({
-          next: data => {
-            if (data !== null) {
-              if (data.ok === 1) {
-                this.modalService.success({
-                  nzTitle: 'Se autorizo la solicitud con folio ' + solicitud.folio,
-                  nzOkText: 'Aceptar'
-                })
-              } else {
-                this.dialog.open(DialogView, {
-                  width: '300px',
-                  data: {titulo: 'Error', mensaje: `Ocurrio un error al ${botonOkTexto.toLowerCase()} la solicitud`}
+    if (estatus === 'CONCLUIDO') {
+      this.modalService.create({
+        nzContent: ModalConfirmacionComponent,
+        nzViewContainerRef: this.viewContainerRef,
+        nzComponentParams: {
+            mensaje: '¿Esta de acuerdo con los precios mostrados hasta ahora ó desea que sea revisada por personal de vitrohogar?'
+          },
+          nzClosable: false,
+          nzFooter: [
+            {
+              label: 'Cerrar',
+              type: 'primary',
+              onClick: (modalInstancia) => {
+                modalInstancia?.cerrarModal();
+              }
+            },
+            {
+              label: 'Solicitar revisión',
+              type:  'primary',
+              onClick: () => {
+                this.afectarSolicitudOrden(solicitud, 'POR REVISAR')
+              }
+            },
+            {
+              label: 'De acuerdo',
+              type: 'primary',
+              danger: true,
+              onClick: () => {
+                this.modalService.confirm({
+                  nzTitle: '¿Esta seguro de continuar?',
+                  nzClosable: false,
+                  nzOkText: 'Continuar',
+                  nzCancelText: 'Cancelar',
+                  nzOnOk: () => {
+                    this.afectarSolicitudOrden(solicitud, 'CONCLUIDO');
+                  }
                 })
               }
-            }
-          },
-          error: err => {
+            },
+          ]
+      })
+    } else {
+      this.modalService.confirm({
+        nzTitle: `¿Esta seguro de rechazar la solicitud con folio ${solicitud.folio}?`,
+        nzOkText: 'Rechazar',
+        nzOkDanger: true,
+        nzCancelText: 'Cancelar',
+        nzOnOk: () => {
+          this.afectarSolicitudOrden(solicitud, 'RECHAZADO');
+        }
+      })
+    }
+  }
+
+
+  afectarSolicitudOrden(solicitud: Subdistribuidor, estatus?: string): void {
+    const botonOkTexto = (estatus === 'CONCLUIDO') ? 'Autorizar' : 'Rechazar';
+    this.http.get<ResultadoAfectar>(this.globalService.urlAPI + `Subdistribuidor/Afectar/${solicitud.id}/${estatus}`, {
+      headers: new HttpHeaders({
+       Authorization: 'Bearer ' + this.usuarioSD.token
+      })
+    }).subscribe({
+      next: data => {
+        if (data !== null) {
+          if (data.ok === 1) {
+            this.modalService.success({
+              nzTitle: `Se ${(estatus === 'CONCLUIDO') ? 'autorizo' : 'rechazo'} la solicitud con folio ${solicitud.folio}`,
+              nzOkText: 'Aceptar',
+              nzOnOk: () => {
+                this.modalService.closeAll();
+                this.buscarSolicitudesPorAutorizar();
+              }
+            })
+          } else {
+            this.modalService.closeAll();
             this.dialog.open(DialogView, {
               width: '300px',
-              data: {titulo: 'Error', mensaje: `Ocurrio un error al ${botonOkTexto.toLowerCase()} la solicitud`}
+              data: {titulo: data.titulo, mensaje: data.descripcion}
             })
           }
-        })
+        } else {
+          this.modalService.closeAll();
+          this.dialog.open(DialogView, {
+            width: '300px',
+            data: {titulo: 'Error', mensaje: `Ocurrio un error al ${botonOkTexto.toLowerCase()} la solicitud, pór favor contacte al area de sistemas de vitrohogar`}
+          })
+        }
       },
-      nzOnCancel: () => {
-        console.log('CANCELO');
+      error: err => {
+        this.dialog.open(DialogView, {
+          width: '300px',
+          data: {titulo: 'Error', mensaje: `Ocurrio un error al ${botonOkTexto.toLowerCase()} la solicitud, pór favor contacte al area de sistemas de vitrohogar`}
+        })
       }
     })
   }

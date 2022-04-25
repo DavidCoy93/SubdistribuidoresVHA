@@ -1,18 +1,131 @@
 <div fxLayout="column" fxFill>
     <div fxFlex="10">
+        <mat-toolbar class="mat-elevation-z5">
+            <div fxLayout="row" fxFill>
+                <div fxFlex="20">
+                    <img src="assets/img/Logotipo_C.png" alt="" [ngClass.xs]="'logoVHA_sm'" [ngClass.sm]="'logoVHA_sm'"  [ngClass.md]="'logoVHA'" [ngClass.lg]="'logoVHA_lg'" [ngClass.xl]="'logoVHA_xl'">
+                </div>
+                <div fxFlexOffset.xs="60" fxFlex.xs="10" fxFlexOffset.sm="60" fxFlex.sm="10" fxFlexOffset.md="50" fxFlex.md="20" fxFlexOffset.lg="50" fxFlex.lg="20" fxFlexOffset.xl="60" fxFlex.xl="20">
+                    <div fxLayout="column">
+                        <div fxFlexOffset.xs="14" fxFlexOffset.sm="8" fxFlexOffset.md="6" fxFlexOffset.lg="5" fxFlexOffset.xl="2">
+                            <button mat-icon-button aria-label="boton usuario vha" [matMenuTriggerFor]="MenuUsuarioVHA">
+                                <mat-icon>account_circle</mat-icon> <span fxHide.xs fxHide.sm>{{usuarioVHA.usuario?.nombre}}</span>
+                            </button>
+                            <mat-menu #MenuUsuarioVHA>
+                                <button mat-menu-item (click)="cerrarSesion()">
+                                    <mat-icon>logout</mat-icon>
+                                    <span>Cerrar sesión</span>
+                                </button>
+                            </mat-menu>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-toolbar>
     </div>
-    <div fxFlex="80">
-        <div fxLayout="row" fxFill>
-            <div fxFlexOffset="10" fxFlex="50">
+    <div fxFlex="80" class="scrollableArea">
+        <nz-page-header nzTitle="Aplicar descuentos a solicitudes de ordenes"></nz-page-header>
+        <div fxLayout="row">
+            <div fxFlexOffset="10" fxFlex="30">
                 <mat-form-field style="width: 100%;">
-                    <mat-label>Cliente</mat-label>
-                    <input type="text" matInput [formControl]="clienteControl" [matAutocomplete]="autoCte">
-                    <mat-autocomplete #autoCte="matAutocomplete">
-                        <mat-option *ngFor="let cliente of listaClientes | async" [value]="cliente">
-                            {{cliente}}
+                    <mat-label>Buscar cliente</mat-label>
+                    <input type="text" matInput [formControl]="clienteControl" [matAutocomplete]="autoCte" (keyup)="buscarClientes()">
+                    <mat-autocomplete #autoCte="matAutocomplete" (optionSelected)="BuscarSolicitudesClienteRevision()">
+                        <mat-option *ngFor="let cliente of Clientes | async" [value]="cliente.cliente">
+                            {{cliente.cliente}}-{{cliente.nombre}}
                         </mat-option>
                     </mat-autocomplete>
                 </mat-form-field>
+            </div>
+        </div>
+        <div fxLayout="row">
+            <div fxFlexOffset="10" fxFlex="80">
+                <!-- <mat-accordion multi *ngIf="solicitudesRevision.length > 0; else sinSolicitudes"> -->
+                <ng-container *ngIf="solicitudesRevision.length > 0; else sinSolicitudes">
+                    <mat-expansion-panel *ngFor="let cteSolicitudes of clienteSolicitudes">
+                        <mat-expansion-panel-header>
+                            <mat-panel-description>
+                                <div fxLayout="row" fxFill>
+                                    <div fxFlex.xs="20" fxFlex.sm="20" fxFlex.md="40" fxFlex.lg="40" fxFlex.xl="40">
+                                        <div fxLayout="column">
+                                            <div fxFlexOffset.md="2" fxFlexOffset.lg="2" fxFlexOffset.xl="2">
+                                                <b>Cliente:</b> {{cteSolicitudes.nombreCliente}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <mat-expansion-panel *ngFor="let solicitud of cteSolicitudes.solicitudes">
+                            <mat-expansion-panel-header>
+                                <mat-panel-description>
+                                    <div fxLayout="row" fxFill>
+                                        <div fxFlex.xs="20" fxFlex.sm="20" fxFlex.md="10" fxFlex.lg="10" fxFlex.xl="10">
+                                            <div fxLayout="column">
+                                                <div fxFlexOffset.md="8" fxFlexOffset.lg="8" fxFlexOffset.xl="8">
+                                                    <b>Folio:</b> {{solicitud.folio}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- <div fxFlex.xs="20" fxFlex.sm="20" fxFlex.md="40" fxFlex.lg="40" fxFlex.xl="40">
+                                            <div fxLayout="column">
+                                                <div fxFlexOffset.md="2" fxFlexOffset.lg="2" fxFlexOffset.xl="2">
+                                                    <b>Cliente:</b> {{solicitud.nombreCliente}}
+                                                </div>
+                                            </div>
+                                        </div> -->
+                                        <div fxFlex.xs="40" fxFlex.sm="40" fxFlex.md="60" fxFlex.lg="60" fxFlex.xl="60">
+                                            <div fxLayout="column">
+                                                <div fxFlexOffset.md="2" fxFlexOffset.lg="2" fxFlexOffset.xl="2">
+                                                    <b>Fecha Alta:</b> {{ solicitud.fechaAlta | date: 'dd/MM/YYYY' }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div fxFlex.xs="10" fxFlex.sm="10" fxFlex.md="15" fxFlex.lg="15" fxFlex.xl="15">
+                                            <button mat-raised-button (click)="revisarSolicitud(solicitud)">Revisado</button>
+                                        </div>
+                                    </div>
+                                </mat-panel-description>
+                            </mat-expansion-panel-header>
+            
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Articulo</th>
+                                            <th>Descripción</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio</th>
+                                            <th>Porcentaje Descuento</th>
+                                            <th>Importe</th>
+                                            <th>Descuento</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let detalle of solicitud.rSubdistribuidorD">
+                                            <td>{{ detalle.articulo }}</td>
+                                            <td>{{ detalle.descripcion }}</td>
+                                            <td class="centrarTextoFila">{{ detalle.cantidad }}</td>
+                                            <td class="centrarTextoFila">{{ detalle.precio| currency }}</td>
+                                            <td class="centrarTextoFila">
+                                                <!-- <nz-input-number [(ngModel)]="detalle.porcentajeDescuento" [nzMin]="0" [nzMax]="100" [nzStep]="0.5" [nzSize]="'small'" (ngModelChange)="detalle.descuento = calcularSubtotalDetalle(detalle)"></nz-input-number> -->
+                                                <input type="number" [min]="0" [(ngModel)]="detalle.porcentajeDescuento" (change)="detalle.descuento = calcularSubtotalDetalle(detalle)">
+                                            </td>
+                                            <td class="centrarTextoFila">{{((detalle.precio / ((detalle.impuesto/100) + 1) * detalle.cantidad | currency))}}</td>
+                                            <td class="centrarTextoFila">{{detalle.descuento | currency}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <app-total-solicitud-orden [Importe]="solicitud.importe" [Impuestos]="solicitud.impuestos" [Descuento]="solicitud.descuentoGlobal" [Observaciones]="solicitud.observaciones"></app-total-solicitud-orden>
+                        </mat-expansion-panel>
+                    </mat-expansion-panel>
+                </ng-container>
+                <!-- </mat-accordion> -->
+                <ng-template #sinSolicitudes>
+                    <nz-result nzStatus="info" nzTitle="por favor busque y seleccione un cliente"></nz-result>
+                </ng-template>
             </div>
         </div>
     </div>

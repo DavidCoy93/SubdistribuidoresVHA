@@ -1,6 +1,6 @@
 import { NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule, Title } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './Components/login/login.component';
@@ -58,10 +58,16 @@ import { TotalSolicitudOrdenComponent } from './Components/total-solicitud-orden
 import { MisOrdenesSolicitudesComponent } from './Components/mis-ordenes-solicitudes/mis-ordenes-solicitudes.component';
 import { NzListModule } from 'ng-zorro-antd/list';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { DescuentosSolicitudesComponent } from './Components/descuentos-solicitudes/descuentos-solicitudes.component';
 import { MatAutocompleteModule  } from '@angular/material/autocomplete';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { ModalEmbarqueComponent } from './Components/modal-embarque/modal-embarque.component';
+import { ModalConfirmacionComponent } from './Components/modal-confirmacion/modal-confirmacion.component';
+import { ModalSucursalesClienteComponent } from './Components/modal-sucursales-cliente/modal-sucursales-cliente.component';
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 registerLocaleData(es, 'es');
 
@@ -78,7 +84,10 @@ registerLocaleData(es, 'es');
     ModalDisponiblesAlmacenComponent,
     TotalSolicitudOrdenComponent,
     MisOrdenesSolicitudesComponent,
-    DescuentosSolicitudesComponent
+    DescuentosSolicitudesComponent,
+    ModalEmbarqueComponent,
+    ModalConfirmacionComponent,
+    ModalSucursalesClienteComponent
   ],
   imports: [
     BrowserModule,
@@ -126,7 +135,10 @@ registerLocaleData(es, 'es');
     MatDatepickerModule,
     MatNativeDateModule,
     NzToolTipModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    NzInputNumberModule,
+    NzDrawerModule,
+    NgSelectModule
   ],
   providers: [
     Title,
@@ -135,6 +147,7 @@ registerLocaleData(es, 'es');
     { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
     { provide: MAT_RADIO_DEFAULT_OPTIONS, useValue: { color: 'warn' }},
     { provide: LOCALE_ID, useValue: 'es'}
+
   ],
   bootstrap: [AppComponent]
 })

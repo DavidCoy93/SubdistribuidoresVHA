@@ -61,6 +61,7 @@ mat-icon {
 button.mat-raised-button {
     background-color: #ff0000 !important;
     color: #fff;
+    margin-left: 3%;
 }
 
 .almacen {

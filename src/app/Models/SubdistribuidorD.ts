@@ -8,9 +8,9 @@ export interface SubdistribuidorD {
     unidad?: string|null,
     almacen?: string|null,
     precio: number,
-    impuesto?: number|null,
-    descuento?: number|null,//valor calculado
-    porcentajeDescuento?: number|null, //porcentaje
+    impuesto: number,
+    descuento: number,//valor calculado
+    porcentajeDescuento: number, //porcentaje
     observaciones?: string|null,
     linea?: string,
     disponible?: number

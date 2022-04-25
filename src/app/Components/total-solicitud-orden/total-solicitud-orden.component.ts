@@ -1,4 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Usuario } from 'src/app/Models/Usuario';
+import { GlobalsService } from 'src/app/Services/globals.service';
 
 @Component({
   selector: 'app-total-solicitud-orden',
@@ -10,8 +12,13 @@ export class TotalSolicitudOrdenComponent implements OnInit {
   @Input() Importe: number = 0;
   @Input() Impuestos: number = 0;
   @Input() Observaciones?: string|null = ''
+  @Input() Descuento: number = 0;
 
-  constructor() { }
+  usuario: Usuario = {};
+
+  constructor(private globalService: GlobalsService) { 
+    this.usuario = this.globalService.UsuarioLogueado;
+  }
 
   ngOnInit(): void {
   }

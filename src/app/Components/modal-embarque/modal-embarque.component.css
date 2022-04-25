@@ -1,0 +1,9 @@
+button.mat-raised-button:not(.mat-datepicker-actions .mat-button-base+.mat-button-base)  {
+    background-color: #ff0000 !important;
+    color: #fff !important;
+    width: 100%;
+}
+
+mat-form-field {
+    width: 100%;
+}

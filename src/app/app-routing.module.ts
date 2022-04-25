@@ -9,6 +9,7 @@ import { LoginComponent } from './Components/login/login.component';
 import { MisOrdenesSolicitudesComponent } from './Components/mis-ordenes-solicitudes/mis-ordenes-solicitudes.component';
 import { SolicitudesAgenteComponent } from './Components/solicitudes-agente/solicitudes-agente.component';
 import { AuthGuard } from './Guards/auth.guard';
+import { UsuarioVHAGuard } from './Guards/usuario-vha.guard';
 
 const routes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -23,7 +24,7 @@ const routes: Routes = [
       {path: 'carrito/:idSolicitud', component: CarritoComponent}
     ]
   },
-  {path: 'descuentos_solicitudes', component: DescuentosSolicitudesComponent},
+  {path: 'descuentos_solicitudes', canActivate: [UsuarioVHAGuard], component: DescuentosSolicitudesComponent},
   {path: '', redirectTo: '/login', pathMatch: 'full'},
   {path: '**', redirectTo: '/login', pathMatch: 'full'}
   

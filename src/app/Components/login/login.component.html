@@ -10,7 +10,7 @@
                         <mat-card-title ngClass.xs="smallText" ngClass.sm="smallText">{{title}}</mat-card-title>
                         <form [formGroup]="loginForm" (ngSubmit)="login()">
                             <mat-form-field appearance="fill" class="linearlayout">
-                                <mat-label>Correo electronico, No. de cliente ó No. de Agente</mat-label>
+                                <mat-label>Correo electronico, No. de cliente, No. Nomina</mat-label>
                                 <input matInput formControlName="usuario" required>
                                 <mat-icon matSuffix>person</mat-icon>
                                 <mat-error *ngIf="usuario?.errors?.['required']">Ingrese su número de cliente</mat-error>

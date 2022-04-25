@@ -1,0 +1,12 @@
+<div fxLayout="row" fxFill>
+    <div fxFlexOffset="10" fxFlex="80">
+        <mat-form-field appearance="standard">
+            <mat-label>Sucursales</mat-label>
+            <mat-select [(ngModel)]="sucursalSeleccionada" (ngModelChange)="seleccionarSucursal($event)">
+                <mat-option *ngFor="let sucursal of sucursales" [value]="sucursal.id">
+                    {{ sucursal.nombre + '-' + sucursal.direccion }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</div>

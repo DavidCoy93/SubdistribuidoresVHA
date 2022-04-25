@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Articulo } from 'src/app/Models/Articulo';
 import { Usuario } from 'src/app/Models/Usuario';
 import { CarritoComponent } from '../carrito/carrito.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';

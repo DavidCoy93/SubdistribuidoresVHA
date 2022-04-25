@@ -19,16 +19,19 @@
                     <mat-panel-title>{{ 'Folio: ' + solicitud.folio }}</mat-panel-title>
                     <mat-panel-description>
                         <div fxLayout="row" fxFill>
-                            <div fxFlex.xs="40" fxFlex.sm="40" fxFlex.md="60" fxFlex.lg="60" fxFlex.xl="60">
-                               Fecha Alta: {{ solicitud.fechaAlta | date: 'dd/MM/YYYY' }}
+                            <div fxFlex.xs="20" fxFlex.sm="20" fxFlex.md="60" fxFlex.lg="60" fxFlex.xl="60" fxHide.xs fxHide.sm>
+                                 <b>Agente: </b>{{ solicitud.nombreAgente }}
                             </div>
+                            <div fxFlex.xs="40" fxFlex.sm="40" fxFlex.md="60" fxFlex.lg="60" fxFlex.xl="60">
+                                <b>Fecha Alta: </b>  {{ solicitud.fechaAlta | date: 'dd/MM/YYYY' }}
+                             </div>
                             <div fxFlex.xs="10" fxFlex.sm="10" fxFlex.md="15" fxFlex.lg="15" fxFlex.xl="15">
-                                <button mat-raised-button (click)="autorizarRechazarSolicitud(solicitud, 'RECHAZAR')">
+                                <button mat-raised-button (click)="autorizarRechazarSolicitud(solicitud, 'RECHAZADO')">
                                     Rechazar
                                 </button>
                             </div>
                             <div fxFlexOffset.xs="5" fxFlex.xs="20" fxFlexOffset.sm="5" fxFlex.sm="20" fxFlex.md="15" fxFlex.lg="15" fxFlex.xl="15">
-                                <button mat-raised-button (click)="autorizarRechazarSolicitud(solicitud, 'AUTORIZAR')">
+                                <button mat-raised-button (click)="autorizarRechazarSolicitud(solicitud, 'CONCLUIDO')">
                                     Autorizar
                                 </button>
                             </div>
