@@ -192,5 +192,4 @@ export class SolicitudesAgenteComponent implements OnInit {
     this.buscarSolicitudesPorAutorizar();
   }
 
-
 }

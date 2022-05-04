@@ -27,6 +27,11 @@ export class SolicitudService {
   }
   public lineaSolicitud: string = '';
   public totalCarritoPendiente: number = 0;
+  sucursalCliente: number = 0;
+  almacenCliente: string = '';
+  condicionCliente: string = '';
+  tipoFormaPago: string = '';
+  listaPrecios: string = ''; 
 
   constructor(
     private globalService: GlobalsService,
@@ -37,7 +42,82 @@ export class SolicitudService {
     private router: Router) 
   { 
     this.usuarioSD = this.globalService.UsuarioLogueado;
+    this.asignarValoresParametrosBusquedaArticulo();
     this.verificarSolicitudesPendientes();
+  }
+
+
+  asignarValoresParametrosBusquedaArticulo(): void {
+    if (this.usuarioSD.esAdmin) {
+
+      if (typeof this.usuarioSD.cliente?.condicion === 'string') {
+        this.condicionCliente = this.usuarioSD.cliente?.condicion;
+        
+        this.tipoFormaPago = (this.usuarioSD.cliente.condicion !== 'CONTADO') ? 'Credito' : 'Contado';
+      }
+
+      if (this.usuarioSD.cliente?.listaPreciosESP !== null)  {
+        if (typeof this.usuarioSD.cliente?.listaPreciosESP === 'string') {
+          this.listaPrecios = this.usuarioSD.cliente?.listaPreciosESP;
+        }
+      } else {
+        this.listaPrecios = '(Precio Lista)';
+      }
+
+      if(this.usuarioSD.cliente?.familia === 'SD AGS' || this.usuarioSD.cliente?.familia === 'SD BAJ' || this.usuarioSD.cliente?.familia === 'SD BAJ 2' || this.usuarioSD.cliente?.familia === 'SD ZAC') {
+        this.sucursalCliente = 1001;
+        if (this.usuarioSD.cliente?.familia === 'SD ZAC') {
+          this.almacenCliente = 'ZAC-100';
+        } else {
+          this.almacenCliente = 'CDG-100';
+        }
+      }
+      
+      if (this.usuarioSD.cliente?.familia === 'SD GDL F' || this.usuarioSD.cliente?.familia === 'SD GDL F2') {
+        this.sucursalCliente = 2001;
+        this.almacenCliente = 'JUP-100';
+      }
+      
+      if (this.usuarioSD.cliente?.familia === 'SD GDL M' || this.usuarioSD.cliente?.familia === 'SD GDL M2') {
+        this.sucursalCliente = 2002;
+        this.almacenCliente = 'NHE-100';
+      }
+
+    } else {
+
+      if (typeof this.usuarioSD.agente?.rAgenteCte.rCte.condicion === 'string') {
+        this.condicionCliente = this.usuarioSD.agente?.rAgenteCte.rCte.condicion;
+        
+        this.tipoFormaPago = (this.usuarioSD.agente?.rAgenteCte.rCte.condicion !== 'CONTADO') ? 'Credito' : 'Contado';
+      }
+
+      if (this.usuarioSD.agente?.rAgenteCte.rCte.listaPreciosESP !== null)  {
+        if (typeof this.usuarioSD.agente?.rAgenteCte.rCte.listaPreciosESP === 'string') {
+          this.listaPrecios = this.usuarioSD.agente?.rAgenteCte.rCte.listaPreciosESP;
+        }
+      } else {
+        this.listaPrecios = '(Precio Lista)';
+      }
+  
+      if(this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD AGS' || this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD BAJ' || this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD BAJ 2' || this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD ZAC') {
+        this.sucursalCliente = 1001;
+        if (this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD ZAC') {
+          this.almacenCliente = 'ZAC-100';
+        } else {
+          this.almacenCliente = 'CDG-100';
+        }
+      }
+      
+      if (this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD GDL F' || this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD GDL F2') {
+        this.sucursalCliente = 2001;
+        this.almacenCliente = 'JUP-100';
+      }
+      
+      if (this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD GDL M' || this.usuarioSD.agente?.rAgenteCte.rCte.familia === 'SD GDL M2') {
+        this.sucursalCliente = 2002;
+        this.almacenCliente = 'NHE-100';
+      }
+    }
   }
 
 
@@ -111,6 +191,24 @@ export class SolicitudService {
 
       if (detalleSolicitud.linea === 'SOBREPEDIDO') {
         detalleSolicitud.almacen = this.solicitudOC.encabezado.almacen;
+        if (typeof this.solicitudOC.encabezado.almacen === 'string') {
+          switch (this.solicitudOC.encabezado.almacen) {
+            case 'CDG-100':
+              detalleSolicitud.almacen = 'CDG-201';
+              break;
+            case 'ZAC-100': 
+              detalleSolicitud.almacen = 'ZAC-201';
+              break;
+            case 'JUP-100':
+              detalleSolicitud.almacen = 'JUP-201';
+              break;
+            case 'NHE-100': 
+              detalleSolicitud.almacen = 'NHE-201';
+              break;  
+            default:
+              break;
+          }
+        }
       } else {
         if (typeof almacen === 'undefined') {
           let encontroAlmacenPorDefecto: boolean = false;
@@ -537,7 +635,7 @@ export class SolicitudService {
 
   obtenerDisponibleArticulo(articulo?: string) {
     const clienteParam = (this.usuarioSD.esAdmin) ? this.usuarioSD.cliente?.cliente : this.usuarioSD.agente?.rAgenteCte.cliente;
-    this.http.get<Articulo>(this.globalService.urlAPI + `Articulos/ArticuloCliente?Articulo=${articulo}&Cliente=${clienteParam}`, 
+    this.http.get<Articulo>(this.globalService.urlAPI + `Articulos/ArticuloCliente?Articulo=${articulo}&Sucursal=${this.sucursalCliente}&Almacen=${this.almacenCliente}&Cliente=${clienteParam}&Condicion=${this.condicionCliente}&TipoFormaPago=${this.tipoFormaPago}&ListaPrecios=${this.listaPrecios}`, 
       { 
         headers: new HttpHeaders({
           Authorization: 'Bearer ' + this.usuarioSD.token

@@ -11,5 +11,6 @@ export interface Usuario {
     success?: boolean|null,
     errors?: Array<string>|null,
     esAdmin?: boolean,
-    esUsuarioVHA?: boolean
+    esUsuarioVHA?: boolean,
+    contrasenaLogin?: string 
 }

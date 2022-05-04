@@ -43,7 +43,8 @@ export class LoginComponent {
   login(): void {
     if (this.loginForm.valid) {
       const UsuarioLogin: Usuario = {
-        esAdmin: true
+        esAdmin: true,
+        contrasenaLogin: this.contrasena?.value
       };
 
       this.http.post<any>(this.globalService.urlAPI +  'Usuarios/LoginSD', {email: this.usuario?.value, password: this.contrasena?.value}).subscribe({
@@ -57,8 +58,23 @@ export class LoginComponent {
           UsuarioLogin.errors = data.errors;
           UsuarioLogin.esAdmin = (UsuarioLogin.cliente !== null) ? true : false;
           UsuarioLogin.esUsuarioVHA = (UsuarioLogin.usuario !== null) ? true : false;
-          localStorage.setItem('usuario', JSON.stringify(UsuarioLogin));
-          location.reload();
+
+          if (typeof UsuarioLogin.success === 'boolean') {
+            if (UsuarioLogin.success && UsuarioLogin.contrasenaLogin === '1234') {
+              this.dialog.open(DialogView, {
+                width: '250px',
+                data: {titulo: 'Advertencia', mensaje: 'es la primera vez que accesa al sistema, por favor restablesca su contraseña'}
+              }).afterClosed().subscribe({
+                next: () => {
+                  localStorage.removeItem('usuario');
+                  this.restablecerContrasena();
+                }
+              })
+            } else {
+              localStorage.setItem('usuario', JSON.stringify(UsuarioLogin));
+              location.reload();
+            }
+          }
         },
         error: err => {
           if(err.status === 0) {
@@ -84,7 +100,7 @@ export class LoginComponent {
   }
 
   restablecerContrasena(): void {
-    window.open('https://pruebas2.vitrohogar.com.mx:4434/consultas/Login/Login', '_blank');
+    window.open(this.globalService.urlRestablecerContrasena, '_blank');
   }
 
   get usuario() { return this.loginForm.get('usuario'); }

@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   UrlAPI: 'https://localhost:44338/api/',
-  impuestoActual: 0.16
+  impuestoActual: 0.16,
+  urlRestablecerContrasena: 'https://pruebas2.vitrohogar.com.mx:4434/consultas/Login/Login'
 };
 
 /*

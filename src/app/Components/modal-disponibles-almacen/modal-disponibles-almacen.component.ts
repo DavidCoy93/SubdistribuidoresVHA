@@ -34,7 +34,13 @@ export class ModalDisponiblesAlmacenComponent implements OnInit {
     subGrupo: '',
     sucursal: 0,
     ultimoCambio: new Date()
-  }; 
+  };
+  sucursalCliente: number = 0;
+  almacenCliente: string = '';
+  condicionCliente: string = '';
+  tipoFormaPago: string = '';
+  listaPrecios: string = ''; 
+
 
   @ViewChild('tbodyArticulos') tbody!: ElementRef
 
@@ -46,11 +52,81 @@ export class ModalDisponiblesAlmacenComponent implements OnInit {
     private solicitudSevice: SolicitudService) 
   {
     this.usuarioLogueado = this.globalService.UsuarioLogueado;
+    if (this.usuarioLogueado.esAdmin) {
+
+      if (typeof this.usuarioLogueado.cliente?.condicion === 'string') {
+        this.condicionCliente = this.usuarioLogueado.cliente?.condicion;
+        
+        this.tipoFormaPago = (this.usuarioLogueado.cliente.condicion !== 'CONTADO') ? 'Credito' : 'Contado';
+      }
+
+      if (this.usuarioLogueado.cliente?.listaPreciosESP !== null)  {
+        if (typeof this.usuarioLogueado.cliente?.listaPreciosESP === 'string') {
+          this.listaPrecios = this.usuarioLogueado.cliente?.listaPreciosESP;
+        }
+      } else {
+        this.listaPrecios = '(Precio Lista)';
+      }
+
+      if(this.usuarioLogueado.cliente?.familia === 'SD AGS' || this.usuarioLogueado.cliente?.familia === 'SD BAJ' || this.usuarioLogueado.cliente?.familia === 'SD BAJ 2' || this.usuarioLogueado.cliente?.familia === 'SD ZAC') {
+        this.sucursalCliente = 1001;
+        if (this.usuarioLogueado.cliente?.familia === 'SD ZAC') {
+          this.almacenCliente = 'ZAC-100';
+        } else {
+          this.almacenCliente = 'CDG-100';
+        }
+      }
+      
+      if (this.usuarioLogueado.cliente?.familia === 'SD GDL F' || this.usuarioLogueado.cliente?.familia === 'SD GDL F2') {
+        this.sucursalCliente = 2001;
+        this.almacenCliente = 'JUP-100';
+      }
+      
+      if (this.usuarioLogueado.cliente?.familia === 'SD GDL M' || this.usuarioLogueado.cliente?.familia === 'SD GDL M2') {
+        this.sucursalCliente = 2002;
+        this.almacenCliente = 'NHE-100';
+      }
+
+    } else {
+
+      if (typeof this.usuarioLogueado.agente?.rAgenteCte.rCte.condicion === 'string') {
+        this.condicionCliente = this.usuarioLogueado.agente?.rAgenteCte.rCte.condicion;
+        
+        this.tipoFormaPago = (this.usuarioLogueado.agente?.rAgenteCte.rCte.condicion !== 'CONTADO') ? 'Credito' : 'Contado';
+      }
+
+      if (this.usuarioLogueado.agente?.rAgenteCte.rCte.listaPreciosESP !== null)  {
+        if (typeof this.usuarioLogueado.agente?.rAgenteCte.rCte.listaPreciosESP === 'string') {
+          this.listaPrecios = this.usuarioLogueado.agente?.rAgenteCte.rCte.listaPreciosESP;
+        }
+      } else {
+        this.listaPrecios = '(Precio Lista)';
+      }
+  
+      if(this.usuarioLogueado.agente?.rAgenteCte.rCte.familia === 'SD AGS' || this.usuarioLogueado.agente?.rAgenteCte.rCte.familia === 'SD BAJ' || this.usuarioLogueado.agente?.rAgenteCte.rCte.familia === 'SD BAJ 2' || this.usuarioLogueado.agente?.rAgenteCte.rCte.familia === 'SD ZAC') {
+        this.sucursalCliente = 1001;
+        if (this.usuarioLogueado.agente?.rAgenteCte.rCte.familia === 'SD ZAC') {
+          this.almacenCliente = 'ZAC-100';
+        } else {
+          this.almacenCliente = 'CDG-100';
+        }
+      }
+      
+      if (this.usuarioLogueado.agente?.rAgenteCte.rCte.familia === 'SD GDL F' || this.usuarioLogueado.agente?.rAgenteCte.rCte.familia === 'SD GDL F2') {
+        this.sucursalCliente = 2001;
+        this.almacenCliente = 'JUP-100';
+      }
+      
+      if (this.usuarioLogueado.agente?.rAgenteCte.rCte.familia === 'SD GDL M' || this.usuarioLogueado.agente?.rAgenteCte.rCte.familia === 'SD GDL M2') {
+        this.sucursalCliente = 2002;
+        this.almacenCliente = 'NHE-100';
+      }
+    }
   }
 
   ngOnInit(): void {
     const ClienteParam = (this.usuarioLogueado.esAdmin) ? this.usuarioLogueado.cliente?.cliente : this.usuarioLogueado.agente?.rAgenteCte.cliente;
-    this.http.get<Articulo>(this.globalService.urlAPI + `Articulos/ArticuloCliente?Articulo=${this.articulo}&Cliente=${ClienteParam}`, 
+    this.http.get<Articulo>(this.globalService.urlAPI + `Articulos/ArticuloCliente?Articulo=${this.articulo}&Sucursal=${this.sucursalCliente}&Almacen=${this.almacenCliente}&Cliente=${ClienteParam}&Condicion=${this.condicionCliente}&TipoFormaPago=${this.tipoFormaPago}&ListaPrecios=${this.listaPrecios}`, 
       { 
         headers: new HttpHeaders({
           Authorization: 'Bearer ' + this.usuarioLogueado.token

@@ -108,6 +108,7 @@
                     </nz-card>
                     <ng-template #precioLista>
                         <b>{{articulo.precioLista | currency}}</b>
+                        <p *ngIf="articulo.precioM2 !== undefined"><b>Precio M2: {{ articulo.precioM2 | currency}} </b></p>
                     </ng-template>
                     <ng-template #imagenArticulo>
                         <img *ngIf="articulo.imagenBase64.length > 0; else imagenNoDisponibleSmall" [src]="'data:image/jpeg;base64,' + articulo.imagenBase64[0]">

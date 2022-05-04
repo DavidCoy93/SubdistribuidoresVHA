@@ -36,12 +36,11 @@
                             <th>Articulo</th>
                             <th>Descripción</th>
                             <th class="centrarTexto">Unidad</th>
-                            <th class="centrarTexto" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'">Disponible</th>
+                            <th class="centrarTexto" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE' && solicitudService.lineaSolicitud === 'STOCK'">Disponible</th>
                             <th class="centrarTexto">Cantidad</th>
                             <th class="centrarTexto" *ngIf="usuario.esAdmin">Precio</th>
                             <th class="centrarTexto" *ngIf="usuario.esAdmin">Importe</th>
-                            <th class="centrarTexto" *ngIf="usuario.esAdmin && (solicitudService.solicitudOC.encabezado.estatus === 'REVISADO' || solicitudService.solicitudOC.encabezado.estatus === 'ENVIADA' || solicitudService.solicitudOC.encabezado.estatus === 'CONCLUIDO')">Descuento</th>
-                            <th class="centrarTexto">Almacén</th>
+                            <th class="centrarTexto" *ngIf="solicitudService.lineaSolicitud === 'STOCK'">Almacén</th>
                             <th class="centrarTexto">Linea</th>
                             <th class="centrarTexto" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'">Opciones</th>
                         </tr>
@@ -51,30 +50,15 @@
                             <td>{{articulo.articulo}}</td>
                             <td>{{articulo.descripcion}}</td>
                             <td class="centrarTexto">{{articulo.unidad}}</td>
-                            <td *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'" class="centrarTexto">{{articulo.disponible}}</td>
+                            <td *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE' && articulo.linea === 'STOCK'" class="centrarTexto">{{articulo.disponible}}</td>
                             <td class="centrarTexto">
                                 <!-- <input style="width: 50px;" type="number" [max]="(articulo.disponible === undefined) ? 0 : articulo.disponible" min="0" [(ngModel)]="articulo.cantidad" (change)="solicitudService.calcularImporte()"> -->
                                 <input style="width: 50px;" [disabled]="solicitudService.solicitudOC.encabezado.estatus !== 'PENDIENTE'" type="number" [(ngModel)]="articulo.cantidad" (change)="solicitudService.modificarCantidadArticulo(articulo)">
                             </td>
                             <td *ngIf="usuario.esAdmin" class="centrarTexto">{{articulo.precio | currency}}</td>
                             <td *ngIf="usuario.esAdmin" class="centrarTexto">{{ ((articulo.precio / ((articulo.impuesto/100) + 1)) * articulo.cantidad ) | currency}}</td>
-                            <td *ngIf="usuario.esAdmin && (solicitudService.solicitudOC.encabezado.estatus=== 'REVISADO' || solicitudService.solicitudOC.encabezado.estatus === 'ENVIADA' || solicitudService.solicitudOC.encabezado.estatus === 'CONCLUIDO')"  class="centrarTexto">{{ articulo.descuento | currency}}</td>
-                            <td class="centrarTexto almacen" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE' && articulo.linea === 'STOCK' ; else almacenDesactivado" [ngSwitch]="articulo.almacen" (click)="verDisponibles(articulo, indice)">
-                                <ng-container *ngSwitchCase="'AYU-100'">AYUNTAMIENTO, AGS</ng-container>
-                                <ng-container *ngSwitchCase="'BLV-100'">BLV A ZAC, AGS</ng-container>
-                                <ng-container *ngSwitchCase="'CDG-100'">CEDIS, AGS</ng-container>
-                                <ng-container *ngSwitchCase="'LOP-100'">LOPEZ MATEOS, AGS</ng-container>
-                                <ng-container *ngSwitchCase="'UNI-100'">UNIVERSIDAD, AGS</ng-container>
-                                <ng-container *ngSwitchCase="'HAC-100'">HACIENDAS, AGS</ng-container>
-                                <ng-container *ngSwitchCase="'PAS-100'">PASEO DE LA CRUZ, AGS</ng-container>
-                                <ng-container *ngSwitchCase="'RIN-100'">RINCÓN DE ROMOS, AGS</ng-container>
-                                <ng-container *ngSwitchCase="'NHE-100'">NIÑOS HEROES, JAL</ng-container>
-                                <ng-container *ngSwitchCase="'JUP-100'">JUAN PABLO, JAL</ng-container>
-                                <ng-container *ngSwitchCase="'GZL-100'">GONZALEZ GALLO, JAL</ng-container>
-                                <ng-container *ngSwitchCase="'ZAC-100'">GUADALUPE, ZAC</ng-container>
-                            </td>
-                            <ng-template #almacenDesactivado>
-                                <td class="centrarTexto" [ngSwitch]="articulo.almacen">
+                            <ng-container *ngIf="solicitudService.lineaSolicitud === 'STOCK'">
+                                <td class="centrarTexto almacen" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE' && articulo.linea === 'STOCK'; else almacenDesactivado" [ngSwitch]="articulo.almacen" (click)="verDisponibles(articulo, indice)">
                                     <ng-container *ngSwitchCase="'AYU-100'">AYUNTAMIENTO, AGS</ng-container>
                                     <ng-container *ngSwitchCase="'BLV-100'">BLV A ZAC, AGS</ng-container>
                                     <ng-container *ngSwitchCase="'CDG-100'">CEDIS, AGS</ng-container>
@@ -88,7 +72,23 @@
                                     <ng-container *ngSwitchCase="'GZL-100'">GONZALEZ GALLO, JAL</ng-container>
                                     <ng-container *ngSwitchCase="'ZAC-100'">GUADALUPE, ZAC</ng-container>
                                 </td>
-                            </ng-template>
+                                <ng-template #almacenDesactivado>
+                                    <td class="centrarTexto" [ngSwitch]="articulo.almacen">
+                                        <ng-container *ngSwitchCase="'AYU-100'">AYUNTAMIENTO, AGS</ng-container>
+                                        <ng-container *ngSwitchCase="'BLV-100'">BLV A ZAC, AGS</ng-container>
+                                        <ng-container *ngSwitchCase="'CDG-100'">CEDIS, AGS</ng-container>
+                                        <ng-container *ngSwitchCase="'LOP-100'">LOPEZ MATEOS, AGS</ng-container>
+                                        <ng-container *ngSwitchCase="'UNI-100'">UNIVERSIDAD, AGS</ng-container>
+                                        <ng-container *ngSwitchCase="'HAC-100'">HACIENDAS, AGS</ng-container>
+                                        <ng-container *ngSwitchCase="'PAS-100'">PASEO DE LA CRUZ, AGS</ng-container>
+                                        <ng-container *ngSwitchCase="'RIN-100'">RINCÓN DE ROMOS, AGS</ng-container>
+                                        <ng-container *ngSwitchCase="'NHE-100'">NIÑOS HEROES, JAL</ng-container>
+                                        <ng-container *ngSwitchCase="'JUP-100'">JUAN PABLO, JAL</ng-container>
+                                        <ng-container *ngSwitchCase="'GZL-100'">GONZALEZ GALLO, JAL</ng-container>
+                                        <ng-container *ngSwitchCase="'ZAC-100'">GUADALUPE, ZAC</ng-container>
+                                    </td>
+                                </ng-template>
+                            </ng-container>
                             <td class="centrarTexto">{{articulo.linea}}</td>
                             <td class="centrarTexto" *ngIf="solicitudService.solicitudOC.encabezado.estatus === 'PENDIENTE'">
                                 <mat-icon matTooltip="Quitar" (click)="solicitudService.quitarDetalleSolicitud(articulo)">delete</mat-icon>

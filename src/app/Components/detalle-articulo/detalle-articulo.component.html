@@ -41,6 +41,7 @@
         <nz-descriptions [nzTitle]="articulo.descripcion1" nzBordered [nzColumn]="{xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }">
             <nz-descriptions-item nzTitle="SKU">{{articulo.articulo}}</nz-descriptions-item>
             <nz-descriptions-item *ngIf="usuario.esAdmin" nzTitle="Precio"> <b>{{articulo.precioLista | currency}}</b></nz-descriptions-item>
+            <nz-descriptions-item *ngIf="usuario.esAdmin && articulo.precioM2 !== undefined" nzTitle="Precio M2"> <b>{{articulo.precioM2 | currency}}</b></nz-descriptions-item>
             <nz-descriptions-item nzTitle="Unidad">{{articulo.unidad}}</nz-descriptions-item>
             <nz-descriptions-item nzTitle="Familia">{{articulo.familia}}</nz-descriptions-item>
             <nz-descriptions-item nzTitle="Linea">{{articulo.linea}}</nz-descriptions-item>

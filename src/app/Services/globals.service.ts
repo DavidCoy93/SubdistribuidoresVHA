@@ -15,6 +15,7 @@ export class GlobalsService {
   public familiaArticulo: string = 'TODAS';
   public lineaArticulo: string = 'TODAS';
   public impuesto: number = environment.impuestoActual;
+  public urlRestablecerContrasena: string = environment.urlRestablecerContrasena;
   
   constructor() { 
     const usuarioLocal: any =  localStorage.getItem('usuario');

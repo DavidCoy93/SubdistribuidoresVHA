@@ -50,6 +50,9 @@ export class CarritoComponent implements OnInit, AfterViewChecked, OnDestroy{
         next: data => {
           this.solicitudService.solicitudOC.encabezado = data;
           this.solicitudService.solicitudOC.detalle = data.rSubdistribuidorD;
+          if (typeof this.solicitudService.solicitudOC.detalle[0].linea === 'string'){
+            this.solicitudService.lineaSolicitud = this.solicitudService.solicitudOC.detalle[0].linea;
+          }
         },
         error: err => {
           this.dialog.open(DialogView, {
